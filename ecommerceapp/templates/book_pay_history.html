@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<title>Pay History</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-3 fs-4">My Orders</h1>
+    <p class="text-muted mb-3 small">
+        Track your recent and past orders below.
+    </p>
+
+    {% for q in qs %}
+    <div class="card mb-4 shadow-sm rounded-4 p-3">
+  <div class="row">
+   <!-- Left Panel: Order Summary -->
+<div class="col-md-4 bg-light rounded-start-4 p-4 border-end">
+  <h5 class="fw-bold mb-4">Order Summary</h5>
+  <div class="mb-3">
+    <div class="small fw-semibold text-secondary">Order ID</div>
+    <div class="fs-6 text-dark">{{ q.order_id }}</div>
+  </div>
+  <div class="mb-3">
+    <div class="small fw-semibold text-secondary">Date</div>
+    <div class="fs-6 text-dark">{{ q.created_date }}</div>
+  </div>
+  <div class="mb-3">
+    <div class="small fw-semibold text-secondary">Total Amount</div>
+    <div class="fs-6 text-dark">₹{{ q.total }}</div>
+  </div>
+  <div class="mb-3">
+    <div class="small fw-semibold text-secondary mb-1">Order Status</div>
+    {% if q.is_paid %}
+      <span class="badge bg-success">Payment Completed</span>
+    {% else %}
+      <span class="badge bg-danger">Payment Pending</span>
+    {% endif %}
+
+     
+   
+  </div>
+
+
+   
+
+    
+  
+</div>
+
+    <!-- Right column: Books & Delivery -->
+    <div class="col-md-8">
+      <h6 class="fw-bold mb-3">Books</h6>
+      <ul class="list-group mb-4">
+        {% for b in q.book_object.all %}
+          <li class="list-group-item d-flex align-items-center justify-content-between">
+            <img src="{{ b.book_image.url }}" alt="{{ b.title }}" style="width: 75px;" class="rounded img-thumbnail me-3">
+            <div class="flex-grow-1">
+              <p class="mb-1 fw-semibold">{{ b.title }}</p>
+              <small class="text-muted">{{ b.author_obj.author_name }}</small>
+            </div>
+           <div><strong>₹{{ b.price }}</strong></div>
+
+      <a href="{% url 'review' b.pk %}" class="btn btn-success ms-3">Add Review</a>
+
+          
+          </li>
+        {% endfor %}
+      </ul>
+
+      <h6 class="fw-bold mb-3">Delivery Details</h6>
+      <div class="bg-light rounded-3 p-3 border small">
+        <div class="row g-2">
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-person-fill text-primary me-3 fs-5"></i>
+            <div><strong>Name:</strong> {{ q.delivery_obj.name }}</div>
+          </div>
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-telephone-fill text-secondary me-3 fs-5"></i>
+            <div><strong>Phone:</strong> {{ q.delivery_obj.phonenumber }}</div>
+          </div>
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-geo-alt-fill text-danger me-3 fs-5"></i>
+            <div><strong>Address:</strong> {{ q.delivery_obj.address }}</div>
+          </div>
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-building text-warning me-3 fs-5"></i>
+            <div><strong>City:</strong> {{ q.delivery_obj.city }}</div>
+          </div>
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-flag-fill text-success me-3 fs-5"></i>
+            <div><strong>State:</strong> {{ q.delivery_obj.state }}</div>
+          </div>
+          <div class="col-6 d-flex align-items-center">
+            <i class="bi bi-mailbox text-info me-3 fs-5"></i>
+            <div><strong>Pincode:</strong> {{ q.delivery_obj.pincode }}</div>
+          </div>
+          <div class="col-12 d-flex align-items-center">
+            <i class="bi bi-truck text-dark me-3 fs-5"></i>
+            <div><strong>Delivery Option:</strong> {{ q.delivery_obj.delivery_options }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    {% empty %}
+    <p class="text-muted">You have no orders yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+

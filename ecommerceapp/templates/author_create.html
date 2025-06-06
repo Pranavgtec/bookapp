@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Add Author</title>
+<style>
+    /* Custom CSS for gradient background and animation */
+    .animated-form-card {
+        background-image: linear-gradient(to right, #4A90E2, #8A2BE2); /* Blue to Blue-Violet Gradient */
+        color: white; /* Default text color for elements inside the card */
+        animation: fadeInScale 0.7s ease-out forwards; /* Apply animation */
+        transform-origin: center; /* Ensure scaling is from the center */
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98); /* Start slightly below and smaller */
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1); /* End at original position and size */
+        }
+    }
+
+    /* Adjust specific Bootstrap component styles for contrast on dark background */
+    .animated-form-card .card-title,
+    .animated-form-card .text-muted, /* For the descriptive paragraph */
+    .animated-form-card .form-label,
+    .animated-form-card .form-text, /* For help text */
+    .animated-form-card .invalid-feedback {
+        color: white !important; /* Ensure these are white */
+    }
+
+    /* Input field styling adjustments */
+    .animated-form-card .form-control,
+    .animated-form-card .form-select {
+        background-color: rgba(255, 255, 255, 0.15); /* Slightly transparent white background */
+        border-color: rgba(255, 255, 255, 0.4); /* Lighter border */
+        color: white; /* Input text color */
+    }
+
+    .animated-form-card .form-control::placeholder,
+    .animated-form-card .form-select option {
+        color: rgba(255, 255, 255, 0.7); /* Placeholder text color */
+    }
+
+    /* Adjust focus state for inputs */
+    .animated-form-card .form-control:focus,
+    .animated-form-card .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.25);
+        border-color: white;
+        box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        color: white;
+    }
+
+    /* Special styling for file input button if needed - Bootstrap default is complex */
+    .animated-form-card .form-control[type="file"] {
+        /* This targets the input itself, not the button inside it. */
+        /* Custom styling for the file input button would require JS or more complex CSS */
+    }
+    
+    /* Ensure link color for form.non_field_errors if applicable */
+    .animated-form-card .alert-danger {
+        background-color: rgba(255, 99, 71, 0.2); /* Slightly transparent red for errors */
+        border-color: tomato;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            {# Applied the custom class for styling #}
+            <div class="card shadow-lg border-0 rounded-lg p-4 animated-form-card">
+                <div class="card-body">
+                    <h2 class="card-title text-center fw-bold mb-4 fs-3">Add New Author</h2> {# Updated heading text #}
+                    <p class="text-center mb-4 text-muted">Enter the details for the new author.</p> {# Updated descriptive text #}
+
+                    <form action="" method="post" novalidate> {# Removed extra form tag and enctype as author form doesn't need file upload #}
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">{{ field.errors }}</div> {# Display errors #}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mb-3" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg shadow">
+                                <i class="bi bi-plus-circle me-2"></i> Add Author {# Updated button text #}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

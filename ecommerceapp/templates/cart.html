@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+
+  <h2 class="h3 fw-bold mb-4">Your Cart</h2>
+
+  <ul class="list-group mb-4">
+    {% for c in cart %}
+   
+    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start py-4">
+      <div class="d-flex w-100 gap-3">
+        <img
+          src="{{ c.book_object.book_image.url }}"
+          alt="{{ c.book_object.title }}"
+          class="flex-shrink-0 rounded object-fit-contain"
+          style="height: 128px; width: 128px;"
+        />
+        <div class="w-100 d-flex flex-column justify-content-between">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h5 class="mb-1 fw-bold">{{ c.book_object.title }}</h5>
+              <ul class="list-unstyled mb-1">
+                <li>Price: {{ c.book_object.price }}</li>
+                <li>Selected Quantity: {{ c.quantity}}</li>
+                
+                <li>Author: {{ c.book_object.author_obj.author_name }}</li>
+              </ul>
+              {% if c.book_object.tag_obj.all %}
+              <div>
+                <span>Tags:</span>
+                {% for t in c.book_object.tag_obj.all %}
+                  <span class="badge bg-secondary">{{ t.name }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-3">
+            <a href="{% url 'cartitem-delete' c.id %}" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+              Remove
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+    {% empty %}
+    <li class="list-group-item py-5 text-center">
+      <h5>Your Cart is Empty</h5>
+      <a href="{% url 'home' %}" class="btn btn-outline-dark mt-3">Back to Shop</a>
+    </li>
+    {% endfor %}
+  </ul>
+
+ 
+  
+
+
+  {% if cart %}
+
+  <div class="text-end mb-4">
+    <p>
+      
+      <strong>Total: {{total}}</strong>
+      <span class="fw-semibold">
+        <b></b> 
+      </span>
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-3 mb-5">
+    <a href="{% url 'home' %}" class="btn btn-outline-dark">Back to Shop</a>
+    <a href="{% url 'delivery-detail'%}" class="btn btn-dark">Checkout</a>
+  </div>
+  
+  {% endif %}
+
+</div>
+{% endblock %}
+
+
+

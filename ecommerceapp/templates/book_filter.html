@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Filter Books</title>
+<!-- Removed custom CSS link as all styling will be in this file or base.html -->
+<!-- <link rel="stylesheet" href="{% static 'css/index.css' %}"> -->
+<style>
+    /* General card styling for book listings */
+    .book-card {
+        border-radius: 0.5rem; /* rounded-lg */
+        background-color: #fff; /* bg-white */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        border: 1px solid #e2e8f0; /* border border-gray-200 */
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .book-card:hover {
+        transform: translateY(-0.25rem); /* hover:-translate-y-1 */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* hover:shadow-xl */
+    }
+
+    .book-card-image-wrapper {
+        overflow: hidden;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        height: 256px; /* h-64 */
+        display: block; /* ensure anchor takes full space */
+    }
+    .book-card-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+        display: block;
+    }
+    .book-card:hover .book-card-image-wrapper img {
+        transform: scale(1.05); /* group-hover:scale-105 */
+    }
+    .book-card-no-image-placeholder {
+        height: 256px; /* h-64 */
+        background-color: #f8f9fa; /* bg-gray-100 */
+        color: #6c757d; /* text-gray-500 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.125rem; /* text-lg */
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+    .book-card-body {
+        padding: 1rem; /* p-4 */
+        flex-grow: 1; /* flex-grow */
+        display: flex;
+        flex-direction: column;
+    }
+    .book-card-title {
+        font-size: 1.125rem; /* text-lg */
+        font-weight: 700; /* font-bold */
+        margin-bottom: 0.25rem; /* mb-1 */
+        color: #212529; /* text-gray-900 */
+        line-height: 1.375; /* leading-tight */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .book-card-author {
+        font-size: 0.875rem; /* text-sm */
+        color: #495057; /* text-gray-600 */
+        font-weight: 400; /* font-normal */
+        margin-bottom: 0.5rem; /* mb-2 */
+    }
+    .book-card-price {
+        font-size: 1.25rem; /* text-xl */
+        font-weight: 700; /* font-bold */
+        color: #198754; /* text-green-600 */
+        margin-bottom: 0.25rem; /* mb-1 */
+    }
+    .book-card-quantity {
+        font-size: 0.875rem; /* text-sm */
+        color: #495057; /* text-gray-600 */
+        margin-bottom: 0.25rem; /* mb-1 */
+    }
+    .book-card-tags {
+        margin-top: auto; /* mt-auto */
+        display: flex; /* flex */
+        flex-wrap: wrap; /* flex-wrap */
+        gap: 0.25rem; /* gap-1 */
+        padding-top: 0.75rem; /* pt-3 */
+        border-top: 1px solid #e2e8f0; /* border-t border-gray-200 */
+        margin-top: 1rem; /* mt-4 */
+    }
+    .book-card-tag {
+        background-color: #f8f9fa; /* bg-gray-100 */
+        color: #495057; /* text-gray-600 */
+        padding: 0.25rem 0.5rem; /* px-2 py-1 */
+        font-size: 0.75rem; /* text-xs */
+        border-radius: 9999px; /* rounded-full */
+        white-space: nowrap; /* whitespace-nowrap */
+        transition: background-color 0.2s ease; /* transition-colors duration-200 */
+    }
+    .book-card-tag:hover {
+        background-color: #e9ecef; /* hover:bg-gray-200 */
+    }
+    .book-card-no-tags {
+        font-size: 0.75rem; /* text-xs */
+        color: #6c757d; /* text-gray-500 */
+        font-style: italic; /* italic */
+    }
+    .book-card-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.125rem; /* gap-0.5 */
+        margin-bottom: 0.5rem; /* mb-2 */
+        font-size: 1.125rem; /* text-lg */
+        line-height: 1; /* to keep star aligned with text */
+    }
+    .book-card-rating .star {
+        color: #ffc107; /* text-yellow-400 */
+    }
+    .book-card-rating .star-empty {
+        color: #ced4da; /* text-gray-300 */
+    }
+    .book-card-rating .star-half {
+        color: #ffc107; /* text-yellow-400 */
+        opacity: 0.5; /* opacity-50 */
+    }
+    .book-card-rating-text {
+        font-size: 0.875rem; /* text-sm */
+        color: #495057; /* text-gray-600 */
+        margin-left: 0.25rem; /* ml-1 */
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container my-5">
+    {# Filter Form Section #}
+    <div class="card shadow-sm border rounded-lg p-4 mb-5"> {# Removed gradient and animation classes #}
+        <div class="card-body">
+            <h2 class="card-title text-center fw-bold mb-4 fs-3">Filter Books</h2>
+            <p class="text-center text-muted mb-4">Use the options below to find the books you're looking for.</p>
+
+            <form method="get" action="" class="d-flex flex-column flex-md-row align-items-center gap-3">
+                {% csrf_token %} {# CSRF token is not strictly needed for GET forms but doesn't hurt #}
+                <div class="flex-grow-1 w-100 w-md-auto"> {# flex-grow-1 takes available space on larger screens #}
+                    <label for="author-select" class="form-label"><strong>Filter by Author:</strong></label> {# Removed text-white #}
+                    <select name="author" id="author-select" onchange="this.form.submit()" class="form-select">
+                        <option value="" {% if not active_author %}selected{% endif %}>All Authors</option>
+                        {% for a in author %}
+                            <option value="{{ a.author_name }}" {% if a.author_name == active_author %}selected{% endif %}>{{ a.author_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group flex-grow-1 w-100 w-md-auto mt-3 mt-md-0" style="max-width: 300px;"> {# input-group for search and button #}
+                    <input type="text" name="q" id="search" value="{{ active_query|default_if_none:'' }}" placeholder="Search books..." class="form-control">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+
+            {# Show error message below the form #}
+            {% if error_message %}
+                <div class="alert alert-warning mt-3"> {# Standard Bootstrap alert #}
+                    {{ error_message }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Book Listing Section #}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3"> {# Using g-3 for consistent gap #}
+        {% for b in books %}
+        <div class="col d-flex"> {# d-flex for equal height cards #}
+            <div class="book-card"> {# Custom class for styling #}
+                {% if b.book_image %}
+                <a href="{% url 'book-detail' b.id %}" class="book-card-image-wrapper">
+                    <img src="{{ b.book_image.url }}" alt="Cover of {{ b.title }}">
+                </a>
+                {% else %}
+                <div class="book-card-no-image-placeholder">
+                    No Image Available
+                </div>
+                {% endif %}
+                <div class="book-card-body">
+                    <h5 class="book-card-title">
+                        <a href="{% url 'book-detail' b.id %}" class="text-decoration-none text-reset hover-link">{{ b.title }}</a>
+                    </h5>
+                    <div class="book-card-author">by {{ b.author_obj }}</div>
+
+                    {# Star Rating with average and count #}
+                    {% if b.avg_rating is not None %}
+                        <div class="book-card-rating">
+                            {% for i in "12345" %}
+                                {% with current_star_value=forloop.counter %}
+                                    <span class="
+                                        {% if b.avg_rating >= current_star_value %}
+                                            star
+                                        {% elif b.avg_rating < current_star_value and b.avg_rating > current_star_value|add:"-1" %}
+                                            star-half
+                                        {% else %}
+                                            star-empty
+                                        {% endif %}
+                                    ">&#9733;</span>
+                                {% endwith %}
+                            {% endfor %}
+                            <span class="book-card-rating-text">({{ b.review_count }} reviews)</span>
+                        </div>
+                    {% else %}
+                        <div class="book-card-rating-text">No ratings yet</div>
+                    {% endif %}
+
+                    <div class="book-card-price">₹{{ b.price }}</div>
+                    <div class="book-card-quantity">Available: {{ b.quantity }}</div>
+
+                    <div class="book-card-tags">
+                        {% for t in b.tag_obj.all %}
+                        <span class="book-card-tag">{{ t }}</span>
+                        {% empty %}
+                        <span class="book-card-no-tags">No tags available</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

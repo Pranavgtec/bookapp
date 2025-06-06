@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>{{ book.title }} - Book Detail</title>
+  <link rel="stylesheet" href="{% static 'css/book_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="card shadow-lg border-0 rounded-4 overflow-hidden mx-auto" style="max-width: 900px;">
+    <div class="row g-0">
+
+      {% if book.book_image %}
+      <div class="col-md-5 d-flex align-items-center bg-white image-hover" style="max-height: 400px; overflow: hidden;">
+        <img 
+          src="{{ book.book_image.url }}" 
+          alt="{{ book.title }}" 
+          class="img-fluid rounded-start" 
+          style="object-fit: contain; max-height: 100%; width: 100%;"
+        >
+      </div>
+      {% endif %}
+
+      <div class="col-md-7">
+        <div class="card-body p-4">
+          <h3 class="card-title fw-bold mb-3">{{ book.title }}</h3>
+
+          <ul class="list-unstyled mb-4">
+            <li><strong class="text-muted">Price:</strong> <span class="text-success fw-semibold">₹{{ book.price }}</span></li>
+
+              <!-- Quantity controls: decrement button, input field, increment button -->
+            <div class="d-inline-flex align-items-center">
+              <button id="decrement" class="btn btn-sm btn-primary">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+              </button>
+
+              <input type="text" id="inputdata" value="1" readonly  class="qty-input">
+
+              <button id="increment" class="btn btn-sm btn-primary">
+                <i class="bi bi-arrow-right-circle-fill"></i>
+              </button>
+            </div>
+
+            <li><strong class="text-muted">Author:</strong> {{ book.author_obj }}</li>
+          </ul>
+
+          <div>
+            <strong class="text-muted">Tags:</strong> 
+            <div class="mt-2">
+              {% for t in book.tag_obj.all %}
+                <span class="badge bg-secondary me-1">{{ t }}</span>
+              {% empty %}
+                <span class="text-muted fst-italic">No tags available</span>
+              {% endfor %}
+            </div> 
+            
+            <!-- Add to Cart button, clicking this triggers JS to add selected qty -->
+            <a href="#" id="addToCartBtn" class="btn btn-primary mt-3 text-white">
+              <img src="https://img.icons8.com/ios-filled/20/ffffff/shopping-cart.png" alt="Cart" class="me-2" />
+              Add to Cart
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+ <div class="container mt-5">
+  <h3 class="mb-3">Reviews</h3>
+
+  <!-- Avg rating  -->
+  <div class="mb-3">
+    <div class="star-rating d-flex gap-1 justify-content-center mt-2">
+  {% for fill in book.star_fills %}
+    <div style="position: relative; width: 32px; height: 32px;">
+      <!-- Empty star background -->
+      <span style="color: lightgray; font-size: 3rem;">&#9733;</span>
+
+      <!-- Filled part of the star -->
+      <span style="
+        color: gold;
+        font-size: 3rem;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: {{ fill }}%;
+        overflow: hidden;
+        white-space: nowrap;
+      ">&#9733;</span>
+    </div>
+  {% endfor %}
+   
+ 
+  </div>
+
+ <div id="reviews-container">
+  {% for r in review %}
+    <div class="py-3 border-bottom review-item" 
+         {% if forloop.counter > 4 %}style="display:none;"{% endif %}>
+      <h5 class="text-warning mb-1 d-flex align-items-center" style="font-size: 1.2rem; gap: 0.25rem;">
+  <span class="star-rating" style="color: gold;">
+    {% for i in "12345" %}
+      {% if i <= r.rating|stringformat:"i" %}
+        &#9733;
+      {% else %}
+        &#9734;
+      {% endif %}
+    {% endfor %}
+  </span>
+  <span class="text-dark">({{ r.user_object }})</span>
+</h5>
+
+      <p class="mb-0 text-muted">{{ r.comment }}</p>
+    </div>
+  {% empty %}
+    <p class="text-muted">No reviews yet.</p>
+  {% endfor %}
+</div>
+
+{% if review|length > 4 %}
+  <button id="toggle-reviews-btn" class="btn btn-primary my-3">Show More</button>
+{% endif %}
+
+
+
+<div class="row">
+  {% for r in related_books %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if r.book_image %}
+        <a href="{% url 'book-detail' r.id %}">
+    <img src="{{ r.book_image.url }}" class="card-img-top" alt="{{ r.title }}" style="height: 250px; object-fit: cover;">
+        </a>
+          
+        {% else %}
+          <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
+            No Image
+          </div>
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ r.title }}</h5>
+          <p class="card-text text-muted">by {{ r.author_obj.author_name }}</p>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No related books found.</p>
+  {% endfor %}
+</div>
+
+
+
+
+<script>
+// Get the decrement button element by its id 'decrement'
+let decrement = document.getElementById('decrement');
+
+// Get the input field element by its id 'inputdata' which shows quantity
+let inputdata = document.getElementById('inputdata');
+
+// Get the increment button element by its id 'increment'
+let increment = document.getElementById('increment');
+
+
+// When "-" button clicked
+decrement.addEventListener('click', () => {
+    // Read current quantity from input field (string), convert to number
+    let data = parseInt(inputdata.value);
+    
+    // Only decrease if quantity is greater than 1 (no zero or negative)
+    if (data > 1) {
+        // Update the input value by subtracting 1
+        inputdata.value = data - 1;
+    }
+});
+
+// When "+" button clicked
+increment.addEventListener('click', () => {
+    // Read current quantity from input field (string), convert to number
+    let data = parseInt(inputdata.value);
+
+    // Read max stock quantity available from Django template variable (string to number)
+    let maxData = parseInt('{{ book.quantity }}');
+
+    // Only increase if current quantity is less than available stock
+    if (data < maxData) {
+        // Update input value by adding 1
+        inputdata.value = data + 1;
+    }
+});
+
+// When "Add to Cart" button clicked
+document.getElementById('addToCartBtn').addEventListener('click', function(event) {
+    event.preventDefault();  // Prevent default link behavior (page reload)
+
+    // Get quantity from input field (string)
+    const quantity = inputdata.value;
+
+    // Construct the URL to call Django view 'addtocart' with book id and quantity as GET parameter
+    const url = `{% url 'addtocart' book.id %}?quantity=${quantity}`;
+
+    // Redirect browser to this URL, adding the book with chosen quantity to the cart
+    window.location.href = url;
+});
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('toggle-reviews-btn');
+    if (!btn) return; // no button, no toggle needed
+
+    const reviews = document.querySelectorAll('.review-item');
+    let showingAll = false;
+
+    btn.addEventListener('click', () => {
+      if (!showingAll) {
+        // Show all reviews
+        reviews.forEach(r => r.style.display = 'block');
+        btn.textContent = 'Show Less';
+        showingAll = true;
+      } else {
+        // Show only first 4 reviews
+        reviews.forEach((r, idx) => {
+          r.style.display = (idx < 4) ? 'block' : 'none';
+        });
+        btn.textContent = 'Show More';
+        showingAll = false;
+      }
+    });
+  });
+</script>
+
+{% endblock %}
