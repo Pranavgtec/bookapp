@@ -1,25 +1,38 @@
 {% extends 'base.html' %}
 
-  {% block title %}
-   <title>Form</title>
-  {% endblock %}
+{% block title %}
+    <title>Edit Profile</title>
+{% endblock %}
 
-  {% block content %}
+{% block content %}
 
-</head>
-<body class="bg-light">
-
-  <div class="container mt-5">
+<div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-5">
-        <h2 class="mb-3 text-center">Edit Profile</h4>
-        <form method="POST" class="border p-4 rounded bg-white shadow-sm" enctype="multipart/form-data">
-          {% csrf_token %}
-          {{ form }}
-          <button type="submit" class="btn btn-primary ">Edit</button>
-        </form>
-      </div>
+        <div class="col-md-6 col-lg-5"> {# Adjusted column size for better visual balance #}
+            
+            <form method="POST" class="border p-4 rounded bg-white shadow-lg" enctype="multipart/form-data"> {# Used shadow-lg for more depth #}
+                {% csrf_token %}
+
+                {# Loop through each field in the form to apply Bootstrap classes #}
+                {% for field in form %}
+                    <div class="mb-3"> {# Add margin-bottom for spacing #}
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bolder text-dark">{{ field.label }}</label>
+                        {{ field }} {# This renders the input tag itself #}
+                        {% if field.help_text %}
+                            <div class="form-text text-muted">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div> {# d-block makes it visible #}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary w-100 mt-3">Update Profile</button> {# w-100 makes the button full width #}
+            </form>
+        </div>
     </div>
-  </div>
+</div>
 
 {% endblock %}

@@ -4,18 +4,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Font Awesome for Plus/Minus icons in Book Detail, Cart, and Admin Forms -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     {% block title %}
     <title>BookSale</title>
     {% endblock %}
 
     <style>
+
+        
         /* Custom styling for the main navbar search/logout buttons */
         /* This ensures they align well and have consistent spacing */
         .navbar .btn {
@@ -44,13 +43,105 @@
             line-height: 1; /* Prevent extra space */
             transform: translate(50%, -50%); /* Adjust position based on element */
         }
+
+        /* Dark mode styles */
+.dark-mode {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+.dark-mode .navbar {
+  background-color: #1f1f1f !important;
+  border-bottom: 1px solid #333;
+}
+
+.dark-mode .navbar a,
+.dark-mode .navbar .nav-link,
+.dark-mode .navbar .btn {
+  color: #f1f1f1 !important;
+}
+
+.dark-mode .btn-outline-danger {
+  color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+}
+
+.dark-mode .btn-outline-danger:hover {
+  background-color: #ff6b6b !important;
+  color: white !important;
+}
+
+.dark-mode .btn-outline-primary {
+  color: #42a5f5 !important;
+  border-color: #42a5f5 !important;
+}
+
+.dark-mode .btn-outline-primary:hover {
+  background-color: #42a5f5 !important;
+  color: white !important;
+}
+
+.dark-mode .card {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+}
+
+.dark-mode table {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+}
+
+.dark-mode th,
+.dark-mode td {
+  border-color: #333 !important;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+  background-color: #2c2c2c;
+}
+
+/* Custom styles for integrated search/cart/theme buttons */
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between the icon buttons */
+}
+
+.navbar-icons .btn-icon {
+    padding: 0.375rem 0.625rem; /* Smaller padding for icon-only buttons */
+    font-size: 1.1rem; /* Slightly larger icon size for better visibility */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-icons .btn-icon i {
+    margin-right: 0; /* Remove margin for icon-only buttons */
+}
+
+/* Adjust button sizes for smaller screens */
+@media (max-width: 767.98px) {
+    .navbar-icons {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .navbar-icons .btn-icon {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+    }
+    .navbar-icons .btn-icon i {
+        margin-right: 0.5rem;
+    }
+}
+
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom py-3"> {# Added py-3 for vertical padding #}
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center fw-bold fs-4" href="{% url 'home' %}">
-            <!-- Simple book icon SVG -->
             <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
                 <rect x="8" y="8" width="48" height="48" rx="6" fill="#4A90E2"/>
                 <path d="M16 8 L32 24 L48 8" stroke="white" stroke-width="3" stroke-linejoin="round"/>
@@ -77,41 +168,133 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
-                <li class="nav-item">
-                    {# Search button as a nav-item #}
-                    <a href="{% url 'book-search' %}" class="btn btn-outline-primary">Search</a>
+                
+                <li class="nav-item navbar-icons d-none d-md-flex"> {# Hidden on small screens, shown on medium and up #}
+                    <a href="{% url 'book-search' %}" class="btn btn-sm btn-outline-primary btn-icon" aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary btn-icon position-relative" href="{% url 'cart' %}" aria-label="Cart">
+                        <i class="bi bi-cart3"></i>
+                        {# Optional cart count badge #}
+                        {# <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span> #}
+                    </a>
+                    <button id="toggle-theme" class="btn btn-sm btn-dark btn-icon" aria-label="Toggle Dark Mode">
+                        <i class="bi bi-moon-stars-fill"></i>
+                    </button>
                 </li>
 
-                <!-- Cart -->
-                <li class="nav-item cart-icon-wrapper"> {# Added custom wrapper class for cart count #}
-                    <a class="nav-link d-flex align-items-center" href="{% url 'cart' %}">
-                        <i class="bi bi-cart3 me-1"></i> Cart
-                        {# Example placeholder for cart count - replace with actual Django variable if available #}
-                        {# <span class="cart-count">3</span> #}
+                <li class="nav-item d-md-none"> {# Shown only on small screens #}
+                    <a href="{% url 'book-search' %}" class="nav-link">
+                        <i class="bi bi-search me-2"></i> Search
                     </a>
                 </li>
+                <li class="nav-item d-md-none"> {# Shown only on small screens #}
+                    <a class="nav-link position-relative" href="{% url 'cart' %}">
+                        <i class="bi bi-cart3 me-2"></i> Cart
+                        {# Optional cart count badge #}
+                        {# <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span> #}
+                    </a>
+                </li>
+                 <li class="nav-item d-md-none"> {# Shown only on small screens #}
+                    <button id="toggle-theme-mobile" class="nav-link btn text-start w-100">
+                        <i class="bi bi-moon-stars-fill me-2"></i> Toggle Dark Mode
+                    </button>
+                </li>
 
-                <li class="nav-item">
+                <li class="nav-item ms-md-2"> {# Add margin-left on medium and up screens #}
                     {% if request.user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'profile-edit' user.id %}">Profile</a>
+                    <a class="btn btn-sm btn-outline-success" href="{% url 'profile-edit' user.id %}">
+                        <i class="bi bi-person-circle me-1"></i> Profile
+                    </a>
                     {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'login' %}">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                    </a>
                     {% endif %}
                 </li>
 
-                <li class="nav-item">
-                    {# Logout button as a nav-item #}
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                {% if request.user.is_authenticated %}
+                <li class="nav-item ms-md-2"> {# Add margin-left on medium and up screens #}
+                    <a href="{% url 'logout' %}" class="btn btn-sm btn-danger">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    </a>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggleButton = document.getElementById('toggle-theme');
+        const themeToggleButtonMobile = document.getElementById('toggle-theme-mobile'); // New button for mobile
+        const body = document.body;
+
+        // Function to apply the theme based on the current state
+        function applyTheme(isDarkMode) {
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                // Update desktop button
+                if (themeToggleButton) {
+                    themeToggleButton.classList.remove('btn-dark');
+                    themeToggleButton.classList.add('btn-light');
+                    themeToggleButton.innerHTML = '<i class="bi bi-sun-fill"></i>';
+                    themeToggleButton.setAttribute('aria-label', 'Toggle Light Mode');
+                }
+                // Update mobile button
+                if (themeToggleButtonMobile) {
+                    themeToggleButtonMobile.innerHTML = '<i class="bi bi-sun-fill me-2"></i> Toggle Light Mode';
+                    themeToggleButtonMobile.setAttribute('aria-label', 'Toggle Light Mode');
+                }
+            } else {
+                body.classList.remove('dark-mode');
+                // Update desktop button
+                if (themeToggleButton) {
+                    themeToggleButton.classList.remove('btn-light');
+                    themeToggleButton.classList.add('btn-dark');
+                    themeToggleButton.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
+                    themeToggleButton.setAttribute('aria-label', 'Toggle Dark Mode');
+                }
+                // Update mobile button
+                if (themeToggleButtonMobile) {
+                    themeToggleButtonMobile.innerHTML = '<i class="bi bi-moon-stars-fill me-2"></i> Toggle Dark Mode';
+                    themeToggleButtonMobile.setAttribute('aria-label', 'Toggle Dark Mode');
+                }
+            }
+        }
+
+        // Initialize theme based on localStorage or default
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            applyTheme(true);
+        } else {
+            applyTheme(false);
+        }
+
+        // Add event listener for desktop button click
+        if (themeToggleButton) {
+            themeToggleButton.addEventListener('click', function() {
+                const isDarkMode = body.classList.contains('dark-mode');
+                applyTheme(!isDarkMode);
+                localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
+            });
+        }
+        
+        // Add event listener for mobile button click
+        if (themeToggleButtonMobile) {
+            themeToggleButtonMobile.addEventListener('click', function() {
+                const isDarkMode = body.classList.contains('dark-mode');
+                applyTheme(!isDarkMode);
+                localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
+            });
+        }
+    });
+</script>
+
 {% block content %}
 {% endblock %}
 
-<!-- Bootstrap Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

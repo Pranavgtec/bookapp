@@ -23,5 +23,7 @@ urlpatterns = [
   path('review/<int:pk>/',views.BookReviewView.as_view(),name='review'),
   path('dashboard/',views.DashboardView.as_view(),name='dashboard'),
   path('book-update/<int:pk>/',views.BookUpdateView.as_view(),name='book-update'),
-  path('book-delete/<int:pk>/',views.BookDeleteView.as_view(),name='book-delete')
+  path('book-delete/<int:pk>/',views.BookDeleteView.as_view(),name='book-delete'),
+  path('no_permission/',views.NOPermissionView.as_view(),name='no_permission'),
+  path('book-list/',views.BookListView.as_view(),name='book_list')
 ]

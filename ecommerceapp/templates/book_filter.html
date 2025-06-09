@@ -149,25 +149,30 @@
     <div class="card shadow-sm border rounded-lg p-4 mb-5"> {# Removed gradient and animation classes #}
         <div class="card-body">
             <h2 class="card-title text-center fw-bold mb-4 fs-3">Filter Books</h2>
-            <p class="text-center text-muted mb-4">Use the options below to find the books you're looking for.</p>
+            <p class="text-center mb-4">Use the options below to find the books you're looking for.</p>
 
-            <form method="get" action="" class="d-flex flex-column flex-md-row align-items-center gap-3">
-                {% csrf_token %} {# CSRF token is not strictly needed for GET forms but doesn't hurt #}
-                <div class="flex-grow-1 w-100 w-md-auto"> {# flex-grow-1 takes available space on larger screens #}
-                    <label for="author-select" class="form-label"><strong>Filter by Author:</strong></label> {# Removed text-white #}
-                    <select name="author" id="author-select" onchange="this.form.submit()" class="form-select">
-                        <option value="" {% if not active_author %}selected{% endif %}>All Authors</option>
-                        {% for a in author %}
-                            <option value="{{ a.author_name }}" {% if a.author_name == active_author %}selected{% endif %}>{{ a.author_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+         <form method="get" action="" class="d-flex flex-wrap align-items-end justify-content-between gap-3">
 
-                <div class="input-group flex-grow-1 w-100 w-md-auto mt-3 mt-md-0" style="max-width: 300px;"> {# input-group for search and button #}
-                    <input type="text" name="q" id="search" value="{{ active_query|default_if_none:'' }}" placeholder="Search books..." class="form-control">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </div>
-            </form>
+  <!-- Author Filter -->
+  <div class="flex-grow-1" style="min-width: 220px;">
+    <label for="author-select" class="form-label"><strong>Filter by Author:</strong></label>
+    <select name="author" id="author-select" onchange="this.form.submit()" class="form-select">
+      <option value="" {% if not active_author %}selected{% endif %}>All Authors</option>
+      {% for a in author %}
+        <option value="{{ a.author_name }}" {% if a.author_name == active_author %}selected{% endif %}>{{ a.author_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Search Input + Button -->
+  <div class="input-group" style="max-width: 300px; flex-grow: 1;">
+    <input type="text" name="q" id="search" value="{{ active_query|default_if_none:'' }}"
+      placeholder="Search books..." class="form-control">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+
+</form>
+
 
             {# Show error message below the form #}
             {% if error_message %}

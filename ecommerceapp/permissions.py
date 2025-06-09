@@ -9,7 +9,8 @@ class SuperUserView(UserPassesTestMixin):
     
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-         return HttpResponseForbidden("You have no permission to access this page")
+         return redirect('no_permission')  # redirect to custom no permission page
+
         return redirect('login') 
 
     

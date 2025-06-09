@@ -2,10 +2,10 @@ from django.shortcuts import render,redirect
 from  django.views.generic import View
 
 from ecommerceapp.forms import RegistrationForm,UserProfileForm,LoginForm,BookForm,TagForm,AuthorForm,DeliveryForm,ReviewForm
-from ecommerceapp.models import UserProfile,Book,CartItems,Cart,DeliveryDetails,OrderSummary,Tag,Author,Review
+from ecommerceapp.models import UserProfile,Book,CartItems,Cart,DeliveryDetails,OrderSummary,Tag,Author,Review,User
 from django.contrib.auth import authenticate,login,logout
 from ecommerceapp.permissions import SuperUserView
-from django.db.models import Sum
+from django.db.models import Sum,Q
 from django.core.paginator import Paginator
 
 """   Razor Pay Section """
@@ -458,9 +458,18 @@ class DashboardView(SuperUserView,View):
     def get(self,request,*args,**kwargs):
         
        book_obj = Book.objects.all()
-          
+
+       users_count_not_admin = User.objects.filter(is_active=True,is_superuser=False).count()
+       book_count = book_obj.count()
+
+       authors = Author.objects.all().count()
+
+       search_query = request.GET.get('search')
+
+       if search_query:
+           book_obj = book_obj.filter(Q(title__icontains=search_query)|Q(author_obj__author_name__icontains=search_query))
         
-       return render(request,'dashboard.html',{'books':book_obj})    
+       return render(request,'dashboard.html',{'books':book_obj,'users':users_count_not_admin,'book_count':book_count,'authors_count':authors,"search_query":search_query})    
 
 class BookUpdateView(SuperUserView,View):
     def get(self,request,*args,**kwargs):
@@ -484,9 +493,14 @@ class BookDeleteView(SuperUserView,View):
         return redirect('dashboard')
     
 
-    
+class NOPermissionView(View):
+    def get(self,request,*args,**kwargs):
+        return render(request,'no_permission.html')
 
-
+class BookListView(View):
+    def get(self,request,*args,**kwargs):
+        books = Book.objects.all()
+        return render(request,'book_list.html',{'books':books})
 
 
 

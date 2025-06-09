@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied - Your Company Name</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif; /* A modern, professional font */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            background-color: #f8f9fa; /* Light background, similar to Bootstrap's default */
+            color: #343a40; /* Darker text for readability */
+            line-height: 1.6;
+            text-align: center; /* Center content within the flex container */
+        }
+
+        /* Container for the error message */
+        .error-container {
+            background-color: #ffffff; /* White background for the card */
+            border-radius: 8px; /* Slightly rounded corners */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            padding: 2.5rem;
+            max-width: 500px; /* Limit width for better readability */
+            margin: 2rem; /* Add margin for smaller screens */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Image Styling */
+        .error-container img {
+            max-width: 250px; /* Adjust size for professional look */
+            height: auto;
+            opacity: 1; /* Remove opacity for a clearer image */
+            margin-bottom: 2rem; /* More space below image */
+        }
+
+        /* Heading Styling */
+        .error-container h2 {
+            color: #dc3545; /* A standard, professional red for errors (Bootstrap danger color) */
+            font-size: 1.8rem;
+            margin-top: 0; /* Reset default margin */
+            margin-bottom: 1rem;
+            font-weight: 600; /* Slightly bolder */
+        }
+
+        /* Paragraph Styling */
+        .error-container p {
+            font-size: 1rem;
+            color: #6c757d; /* Muted text for secondary information */
+            margin-bottom: 1.5rem;
+        }
+
+        /* Action Buttons/Links */
+        .actions {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column; /* Stack buttons on smaller screens */
+            gap: 1rem; /* Space between buttons */
+            width: 100%; /* Make buttons span full width of container */
+        }
+
+        .actions a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            width: fit-content; /* Adjust width to content for desktop */
+            margin: 0 auto; /* Center buttons horizontally */
+        }
+
+        .actions .btn-primary {
+            background-color: #007bff; /* Primary brand color (Bootstrap blue) */
+            color: #ffffff;
+            border: 1px solid #007bff;
+        }
+
+        .actions .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .actions .btn-secondary {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff; /* Use primary color for border to link visually */
+        }
+
+        .actions .btn-secondary:hover {
+            background-color: #e9ecef;
+            color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* Optional: Footer with support contact */
+        .footer-note {
+            font-size: 0.85rem;
+            color: #adb5bd; /* Even more muted */
+            margin-top: 2rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .error-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            .error-container h2 {
+                font-size: 1.5rem;
+            }
+            .actions a {
+                width: 90%; /* Make buttons wider on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        
+        <h2>Access Denied</h2>
+        <p>It looks like you don't have the necessary permissions to view this page. This content might be restricted to specific users or roles.</p>
+        <div class="actions">
+            <a href="{% url 'home'  %}" class="btn-primary">Go to Homepage</a>
+          
+        </div>
+      
+    </div>
+</body>
+</html>
