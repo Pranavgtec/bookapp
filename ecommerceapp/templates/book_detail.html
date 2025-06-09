@@ -24,10 +24,10 @@
 
       <div class="col-md-7">
         <div class="card-body p-4">
-          <h3 class="card-title fw-bold mb-3">{{ book.title }}</h3>
+          <h3 class=" fw-bold mb-3">{{ book.title }}</h3>
 
           <ul class="list-unstyled mb-4">
-            <li><strong class="text-muted">Price:</strong> <span class="text-success fw-semibold">₹{{ book.price }}</span></li>
+            <li><strong >Price:</strong> <span class="text-success fw-semibold">₹{{ book.price }}</span></li>
 
               <!-- Quantity controls: decrement button, input field, increment button -->
             <div class="d-inline-flex align-items-center">
@@ -42,16 +42,16 @@
               </button>
             </div>
 
-            <li><strong class="text-muted">Author:</strong> {{ book.author_obj }}</li>
+            <li><strong >Author:</strong> {{ book.author_obj }}</li>
           </ul>
 
           <div>
-            <strong class="text-muted">Tags:</strong> 
+            <strong>Tags</strong> 
             <div class="mt-2">
               {% for t in book.tag_obj.all %}
                 <span class="badge bg-secondary me-1">{{ t }}</span>
               {% empty %}
-                <span class="text-muted fst-italic">No tags available</span>
+                <span class=" fst-italic">No tags available</span>
               {% endfor %}
             </div> 
             
