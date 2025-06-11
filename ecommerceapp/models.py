@@ -45,7 +45,7 @@ class Book(models.Model):
     user_object = models.ForeignKey(User,on_delete=models.CASCADE)
     author_obj = models.ForeignKey(Author,on_delete=models.CASCADE)
     tag_obj = models.ManyToManyField(Tag)
-    
+    favourite = models.ManyToManyField(User,related_name='favourite',blank=True)
 
     def __str__(self):
         return self.title
@@ -178,6 +178,9 @@ class Review(models.Model):
     def __str__(self):
         return self.user_object.username                                                                                                        
 
+
+
+    
 
     
 from django.db.models.signals import post_save

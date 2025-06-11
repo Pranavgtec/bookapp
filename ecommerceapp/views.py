@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponseRedirect
 from  django.views.generic import View
 
 from ecommerceapp.forms import RegistrationForm,UserProfileForm,LoginForm,BookForm,TagForm,AuthorForm,DeliveryForm,ReviewForm
@@ -58,37 +58,28 @@ class LogoutView(View):
         return redirect('login')
 
 class IndexView(View):
-    
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-           return redirect('login')
- 
+            return redirect('login')
         else:
-             
-                
-             qs = Book.objects.all().order_by('id')
-             
-             
-             for q in qs:
-                 
-                 print("data:",q.avg_rating)
-                 print("star",q.star_fills)
+            qs = Book.objects.all().order_by('id')
+            for book in qs:
+                book.is_favorited = book.favourite.filter(id=request.user.id).exists()
 
-            
-                 
-                 
+            if 'book_id' in request.GET:
+                book_id = request.GET.get('book_id')
+                book = Book.objects.get(id=book_id)
+                if book.favourite.filter(id=request.user.id).exists():
+                    book.favourite.remove(request.user)
+                else:
+                    book.favourite.add(request.user)
+                return redirect('home')
 
-             paginator = Paginator(qs,8) # show 8 books per page
+            paginator = Paginator(qs, 8)  # show 8 books per page
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            return render(request, 'index.html', {'page_obj': page_obj})
 
-
-             page_number = request.GET.get('page')
-             page_obj = paginator.get_page(page_number)
-             print(page_obj)
-
-             
-
-            
-             return render(request,'index.html',{'page_obj':page_obj})
                         
 class EditProfileView(View):
    
@@ -274,13 +265,14 @@ class CheckoutView(View):
         }
         payment = client.order.create(data=data)
 
-        print("payment: ", payment)
+        # print("payment: ", payment)
 
         data = {
             'order_id': payment.get('id'),
             'amount': payment.get('amount'),
             'key': KEY_ID
         }
+        
 
         cart_items = CartItems.objects.filter(
             is_order_placed=False,
@@ -288,7 +280,7 @@ class CheckoutView(View):
         )
 
         delivery_object = DeliveryDetails.objects.filter(user_obj=request.user)
-        print(delivery_object)
+        # print(delivery_object)
 
         for del_obj in delivery_object:
             del_obj
@@ -328,13 +320,20 @@ class PaymentVerificationView(View):
         client = razorpay.Client(auth=(KEY_ID, SECRET_KEY))
 
         # Get the OrderSummary object by matching razorpay_order_id from POST data
-        ordersummary_id = OrderSummary.objects.get(order_id=request.POST.get('razorpay_order_id'))
+
+        try:
+            ordersummary_id = OrderSummary.objects.get(order_id=request.POST.get('razorpay_order_id'))
+            print("order summary object retrieved")
+        
+        except OrderSummary.DoesNotExist:
+            print("order summary object not found")
+
 
         # Print current logged-in user (for debugging)
         print("user:", request.user)
 
         # Log in the user associated with the order (in case not logged in)
-        login(request, ordersummary_id.user_object)
+        # login(request, ordersummary_id.user_object)
 
         try:
             # Verify the payment signature to confirm payment authenticity
@@ -502,6 +501,23 @@ class BookListView(View):
         books = Book.objects.all()
         return render(request,'book_list.html',{'books':books})
 
+
+class BookFavouritesView(View):
+    def get(self,request,*args,**kwargs):
+
+      if not request.user.is_authenticated:
+        return redirect('login') 
+      else: 
+        favourite_books = Book.objects.filter(favourite=request.user)
+        print(favourite_books)
+        return render(request,'book_favourite.html',{'favourite_books':favourite_books})
+
+class BookFavouriteDeleteView(View):
+    def get(self,request,*args,**kwargs):
+        book_id = kwargs.get('pk')
+        book_object = Book.objects.get(id=book_id)
+        book_object.favourite.remove(request.user)
+        return redirect('favourite_books')
 
 
 
