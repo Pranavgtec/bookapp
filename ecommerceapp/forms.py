@@ -1,5 +1,5 @@
 from django import forms
-from ecommerceapp.models import UserProfile,Book,Tag,Author,DeliveryDetails,Review
+from ecommerceapp.models import UserProfile,Book,Tag,Author,DeliveryDetails,Review,Inquiry
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -82,3 +82,9 @@ class ReviewForm(forms.ModelForm):
             'comment' : forms.TextInput(attrs={'class':'form-control mb-2'}),
            
         }
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Inquiry
+        fields = ['first_name','last_name','email','phone','message','interests']
+        

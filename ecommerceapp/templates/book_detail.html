@@ -2,8 +2,11 @@
 {% load static %}
 
 {% block title %}
+  <head>
   <title>{{ book.title }} - Book Detail</title>
-  <link rel="stylesheet" href="{% static 'css/book_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/book_detail.css' %}">
+  </head>
+  
 {% endblock %}
 
 {% block content %}
@@ -70,30 +73,37 @@
  <div class="container mt-5">
   <h3 class="mb-3">Reviews</h3>
 
-  <!-- Avg rating  -->
-  <div class="mb-3">
-    <div class="star-rating d-flex gap-1 justify-content-center mt-2">
-  {% for fill in book.star_fills %}
-    <div style="position: relative; width: 32px; height: 32px;">
-      <!-- Empty star background -->
-      <span style="color: lightgray; font-size: 3rem;">&#9733;</span>
+ <div class="mb-3 d-flex justify-content-center">
+  <div class="d-flex align-items-center gap-2">
+    <!-- Average Rating Number -->
+    <span><strong>{{ book.avg_rating|default_if_none:''  }}</strong></span>
 
-      <!-- Filled part of the star -->
-      <span style="
-        color: gold;
-        font-size: 3rem;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: {{ fill }}%;
-        overflow: hidden;
-        white-space: nowrap;
-      ">&#9733;</span>
+    <!-- Stars (unchanged) -->
+    <div class="d-flex gap-1">
+      {% for fill in book.star_fills %}
+        <div style="position: relative; width: 32px; height: 32px;">
+          <!-- Empty star background -->
+          <span style="color: lightgray; font-size: 3rem;">&#9733;</span>
+
+          <!-- Filled part of the star -->
+          <span style="
+            color: gold;
+            font-size: 3rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: {{ fill }}%;
+            overflow: hidden;
+            white-space: nowrap;
+          ">&#9733;</span>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-   
- 
   </div>
+</div>
+
+
+
 
  <div id="reviews-container">
   {% for r in review %}
@@ -109,13 +119,13 @@
       {% endif %}
     {% endfor %}
   </span>
-  <span class="text-dark">({{ r.user_object }})</span>
+  <span>({{ r.user_object }})</span>
 </h5>
 
-      <p class="mb-0 text-muted">{{ r.comment }}</p>
+      <p class="mb-0">{{ r.comment }}</p>
     </div>
   {% empty %}
-    <p class="text-muted">No reviews yet.</p>
+    <p>No reviews yet.</p>
   {% endfor %}
 </div>
 
@@ -149,6 +159,64 @@
     <p>No related books found.</p>
   {% endfor %}
 </div>
+
+{% if review %}
+<div id="testimonialCarousel" class="carousel slide text-center carousel-dark" data-bs-ride="carousel" v>
+  <div class="carousel-inner">
+
+    {% for r in review %}
+    
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      {% if r.user_object.userprofile.profile_picture %}
+      <img class="rounded-circle shadow mb-4" src="{{ r.user_object.userprofile.profile_picture.url }}"
+        alt="{{ r.user_object.username }}" style="width: 150px; height: 150px; object-fit: cover;" />
+      
+      {% endif %}
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <h5 class="mb-3">{{ r.user_object.username }}</h5>
+          {% if r.user_object.userprofile.bio %}
+          <p>{{ r.user_object.userprofile.bio }}</p>
+          {% else %}
+          <p>No bio available</p>
+          {% endif %}
+          <p class="text-muted">
+            <i class="fas fa-quote-left pe-2"></i>
+            {{ r.comment }}
+          </p>
+        </div>
+      </div>
+      <ul class="list-unstyled d-flex justify-content-center text-warning mb-0">
+        {% for i in "12345" %}
+          {% if i <= r.rating|stringformat:"i" %}
+            <li><i class="fas fa-star fa-sm"></i></li> {# Filled star #}
+          {% else %}
+            <li><i class="far fa-star fa-sm"></i></li> {# Empty star #}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% empty %}
+    <div class="carousel-item active">
+      <p class="text-muted">No reviews yet.</p>
+    </div>
+    {% endfor %}
+
+  </div>
+  {% endif %}
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
 
 
 

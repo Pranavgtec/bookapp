@@ -1,66 +1,215 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-{% load static %}
-    <title>Favourite Books</title>
+    <title>Your Favourite Books</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Custom Styles for Professional Table Look */
+        .professional-table {
+            border-collapse: separate; /* Allows for border-spacing */
+            border-spacing: 0 0.8rem; /* Vertical spacing between rows */
+        }
+
+        .professional-table thead th {
+            background-color: #2c3e50; /* Darker header background */
+            color: #ecf0f1; /* Light text for header */
+            border: none;
+            padding: 1.2rem 1rem; /* More padding for header cells */
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .professional-table tbody tr {
+            background-color: #ffffff; /* White background for rows */
+            border-radius: 8px; /* Rounded corners for rows */
+            overflow: hidden; /* Ensures content stays within rounded corners */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+
+        .professional-table tbody tr:hover {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+        }
+
+        .professional-table tbody td {
+            border: none; /* Remove default cell borders */
+            padding: 1rem 1rem; /* Consistent padding for body cells */
+            vertical-align: middle; /* Align content vertically in the middle */
+        }
+
+        .table-book-image {
+            width: 80px; /* Slightly larger image for better visibility */
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-right: 15px; /* More space between image and text */
+        }
+
+        /* Custom Add to Cart Button Style */
+        .btn-add-to-cart {
+            background-color: #FFD700; /* Gold color */
+            color: #FFFFFF; /* White text */
+            border: 1px solid #CCAA00; /* Slightly darker gold border */
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: orange; /* Darker gold on hover */
+            border-color: #B39900;
+            color: #FFFFFF; /* Ensure text remains white on hover */
+            transform: translateY(-1px); /* Slight lift on hover */
+        }
+
+        .btn-add-to-cart:focus, .btn-add-to-cart:active {
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.5) !important; /* Gold focus ring */
+        }
+
+        .btn-add-to-cart:disabled {
+            background-color: #cccccc;
+            border-color: #bbbbbb;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+
+        /* Responsive table for mobile screens */
+        @media (max-width: 767.98px) {
+            .professional-table {
+                border-spacing: 0; /* Remove spacing between rows for mobile */
+            }
+            .professional-table thead {
+                display: none; /* Hide table headers on small screens */
+            }
+            .professional-table tbody tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            .professional-table tbody td {
+                text-align: right;
+                padding-left: 45%; /* Make space for pseudo-elements */
+                position: relative;
+                display: block; /* Make table cells behave like blocks */
+                border-bottom: 1px dashed #f0f0f0; /* Separator between mobile rows */
+            }
+            .professional-table tbody td:last-child {
+                border-bottom: none; /* No border for the last cell in a mobile row */
+            }
+            .professional-table td::before {
+                content: attr(data-label); /* Use data-label for content */
+                position: absolute;
+                left: 1rem;
+                width: calc(45% - 1rem); /* Adjust width to align labels */
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            .professional-table td.product-name-cell {
+                text-align: left; /* Keep product name left-aligned */
+                padding-left: 1rem; /* No pseudo-element needed for this cell */
+            }
+            .professional-table td.actions-cell {
+                text-align: center; /* Center the action buttons */
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            .table-book-image {
+                margin-right: 10px; /* Adjust margin for mobile */
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-    <div class="container py-4">
-        
-     
-     
-        <div class="d-flex flex-wrap justify-content-start align-items-stretch"> 
-            {% for book in favourite_books %}
-            
-                
-              
-                <div class="p-2 col-12 col-sm-6 col-md-4 col-lg-3"> 
-                    {# Use Bootstrap's card component for styling #}
-                    <div class="card h-100 shadow-sm border-0 rounded-lg"> 
-                         <a href="{% url 'delete_favourite' book.id %}" class="position-absolute top-0 end-0 m-2 text-danger">
-                        <i class="fas fa-times"></i>
-                            </a>
-                        {% if book.book_image %}
-                            
-                            <img src="{{ book.book_image.url }}" alt="Cover of {{ book.title }}" class="card-img-top img-fluid rounded-top" style="height: 250px; object-fit: cover;">
-                        {% else %}
-                          
-                            <div class="bg-light d-flex align-items-center justify-content-center text-muted font-weight-bold p-3 rounded-top" style="height: 250px;">
-                                No Image Available
-                            </div>
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                      
-                            <h5 class="card-title text-primary mb-2 text-truncate">{{ book.title }}</h5> 
-                     
-                            <div class="text-secondary small mb-1">by {{ book.author_obj }}</div>
-                          
-                            <strong class="text-warning mb-2 d-block">{{ book.avg_rating|default_if_none:'N/A' }}</strong> 
-                       
-                            <div class="text-success fw-bold fs-5 mb-1">₹{{ book.price }}</div>
-                           
-                            <div class="text-muted small mb-1">Available: {{ book.quantity }}</div>
-                            <div class="text-muted small mb-2">Reviews: {{ book.review_count }}</div>
-                           
-                            <div class="mt-auto d-flex flex-wrap gap-1"> 
-                                {% for t in book.tag_obj.all %}
-                                    <span class="badge bg-info text-dark">{{ t }}</span> 
-                                {% empty %}
-                                    <span class="text-muted small fst-italic">No tags available</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
+    <div class="container py-5">
+        <h4 class="mb-4 text-center display-5 fw-bold ">Your Favourite Books</h2>
+        <p class="lead text-center  mb-5">
+            A curated list of the books you've marked as your favorites.
+        </p>
+
+        {% if favourite_books %}
+            <div class="table-responsive"> {# Makes the table scrollable on small screens #}
+                <table class="table professional-table align-middle">
+                    <thead class="text-white">
+                        <tr>
+                            <th scope="col" class="text-center">Remove</th>
+                            <th scope="col">Book Details</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Availability</th>
+                            <th scope="col" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in favourite_books %}
+                            <tr>
+                                <td class="text-center" data-label="Remove">
+                                    <a href="{% url 'delete_favourite' book.id %}" class="text-danger" title="Remove from favourites">
+                                        <i class="fas fa-trash-alt fa-lg"></i>
+                                    </a>
+                                </td>
+                                <td data-label="Book Details" class="product-name-cell">
+                                    <div class="d-flex align-items-center">
+                                        {% if book.book_image %}
+                                            <img src="{{ book.book_image.url }}" alt="Cover of {{ book.title }}" class="table-book-image">
+                                        {% else %}
+                                            <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="width: 80px; height: 100px; border-radius: 4px; margin-right: 15px;">
+                                                <i class="fas fa-book fa-2x"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <a href="{% url 'book-detail' book.id %}" class="fw-bold text-decoration-none text-dark d-block mb-1">{{ book.title }}</a>
+                                            <small class="text-muted">by {{ book.author_obj }}</small>
+                                            <br>
+                                            <small class="text-warning">
+                                                {% if book.avg_rating %}<i class="fas fa-star"></i> {{ book.avg_rating|floatformat:1 }}{% else %}N/A Rating{% endif %} ({{ book.review_count|default:0 }} reviews)
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Price" class="fw-bold text-primary">₹{{ book.price }}</td>
+                                <td data-label="Availability">
+                                    {% if book.quantity > 0 %}
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">In Stock ({{ book.quantity }})</span>
+                                    {% else %}
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill">Out of Stock</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center actions-cell" data-label="Action">
+                                    {% if book.quantity > 0 %}
+                                        <a href="{% url 'addtocart' book.id %}?quantity=1" class="btn btn-add-to-cart">
+                                            <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-ban me-2"></i> Out of Stock
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="col-12 mt-5">
+                <div class="alert alert-info text-center py-4 border-0 shadow-sm" role="alert">
+                    <h4 class="alert-heading"><i class="fas fa-bookmark me-2"></i> No Favourite Books Yet!</h4>
+                    <p>It looks like you haven't added any books to your favorites. Start exploring our vast collection and find your next great read!</p>
+                    <hr>
+                    <p class="mb-0">
+                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg rounded-pill px-4">Browse Books Now <i class="fas fa-arrow-right ms-2"></i></a>
+                    </p>
                 </div>
-            {% empty %}
-               
-                <div class="col-12 mt-4">
-                    <div class="alert alert-warning text-center" role="alert">
-                        No favorite books found.
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

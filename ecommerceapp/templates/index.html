@@ -7,94 +7,120 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h3 style="text-align:center; margin-bottom: 2rem;"> 👋 Welcome back, <strong>{{ request.user }}</strong>! </h3>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
-            {% for q in page_obj %}
-                <div class="col">
-                    <div class="card h-100">
-                        {% if q.book_image %}
-                            <div class="position-relative">
-                                <a href="{% url 'book-detail' q.id %}" class="image-hover ">
-                                    <img src="{{ q.book_image.url }}" alt="Cover of {{ q.title }}" class="w-100 ">
-                                    <a href="?book_id={{ q.id }}">
-                                        <i class="heart-icon {% if q.is_favorited %}fas{% else %}far{% endif %} fa-heart position-absolute top-0 end-0 m-2 fs-4" style="color: {% if q.is_favorited %}red{% endif %}"></i>
-                                    </a>
-                                </a>
-                            </div>
+
+<div class="container-fluid">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 mt-2">
+        {% for q in page_obj %}
+            <div class="col">
+                <div class="book-tile position-relative"> {# Add position-relative to the parent for absolute positioning #}
+                    {% if q.book_image %}
+                        {# Link for book detail page #}
+                        <a href="{% url 'book-detail' q.id %}" class="book-image-link">
+                            <img src="{{ q.book_image.url }}" alt="Cover of {{ q.title }}">
+                        </a>
+                        {# Heart icon for favoriting - conditional link based on authentication #}
+                        {% if request.user.is_authenticated %}
+                            <a href="?book_id={{q.id}}&page={{ page_obj.number }}" class="heart-icon-link">
+                                <i class="heart-icon {% if q.is_favorited %}fas{% else %}far{% endif %} fa-heart position-absolute top-0 end-0 m-2 fs-4" style="color: {% if q.is_favorited %}red{% endif %}"></i>
+                            </a>
                         {% else %}
-                            <div class="no-image-placeholder">No Image Available</div>
+                            {# Link to login page or a disabled icon/tooltip #}
+                            <a href="{% url 'login' %}" class="heart-icon-link" title="Login to add to favorites">
+                                <i class="heart-icon far fa-heart position-absolute top-0 end-0 m-2 fs-4" style="color: grey;"></i>
+                            </a>
                         {% endif %}
-                        <div class="card-body">
-                            <h5 class=" text">{{ q.title }}</h5>
-                            <div class="author">by {{ q.author_obj }}</div>
-                            <strong>{{q.avg_rating|default_if_none:''}}</strong>
-                            <div class="text-center mt-2">
-                                <div class="text-center mt-2">
-                                    <div class="star-rating d-flex gap-1 justify-content-center mt-2">
-                                        {% for fill in q.star_fills %}
-                                            <div style="position: relative; width: 32px; height: 32px;">
-                                                <!-- Empty star background -->
-                                                <span style="color: lightgray; font-size: 2rem;">&#9733;</span>
-                                                <!-- Filled part of the star -->
-                                                <span style=" color: gold; font-size: 2rem; position: absolute; top: 0; left: 0; width: {{ fill }}%; overflow: hidden; white-space: nowrap; ">&#9733;</span>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="price">₹{{ q.price }}</div>
-                            <div class="quantity">Available: {{ q.quantity }}</div>
-                            <div class="quantity">Review: {{ q.review_count }}</div>
-                            <div class="tags">
-                                {% for t in q.tag_obj.all %}
-                                    <span class="badge">{{ t }}</span>
-                                {% empty %}
-                                    <span class="text-muted small">No tags available</span>
-                                {% endfor %}
-                            </div>
-                        </div>
+                    {% else %}
+                        <div class="no-image">No Image</div>
+                        {# If no image, still allow favoriting or adjust as needed #}
+                        {% if request.user.is_authenticated %}
+                            <a href="?book_id={{q.id}}&page={{ page_obj.number }}" class="heart-icon-link">
+                                <i class="heart-icon {% if q.is_favorited %}fas{% else %}far{% endif %} fa-heart position-absolute top-0 end-0 m-2 fs-4" style="color: {% if q.is_favorited %}red{% endif %}"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="heart-icon-link" title="Login to add to favorites">
+                                <i class="heart-icon far fa-heart position-absolute top-0 end-0 m-2 fs-4" style="color: grey;"></i>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    <p class="book-title">{{ q.title }}</p>
+                    <p class="author-name">by {{ q.author_obj }}</p>
+                    <p class="price">₹{{ q.price }}</p>
+                   <div class="star-rating">
+    {% for fill in q.star_fills %}
+        <div class="star-wrapper">
+            <span class="star-bg">&#9733;</span> <!-- Empty star -->
+            <span class="star-fill" style="width: {{ fill }}%;">&#9733;</span> <!-- Filled star -->
+        </div>
+    {% endfor %}
+</div>
+                    
+                    <p class="stock">Available: {{ q.quantity }}</p>
+                    <p class="review">Review: {{ q.review_count }}</p>
+                    <div class="tags">
+                        {% for t in q.tag_obj.all %}
+                            <span class="badge">{{ t }}</span>
+                        {% empty %}
+                            <span class="text-muted small">No tags available</span>
+                        {% endfor %}
                     </div>
                 </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-warning">No books are currently available.</div>
-                </div>
-            {% endfor %}
-        </div>
-        <!-- Pagination controls -->
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    </li>
-                {% else %}
-                    <li class="page-item">
-                        <span class="page-link disabled">Previous</span>
-                    </li>
-                {% endif %}
-                {% for num in page_obj.paginator.page_range %}
-                    {% if num == page_obj.number %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
-                    {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">Next</span>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <div class="alert alert-warning">No books are currently available.</div>
+            </div>
+        {% endfor %}
     </div>
+
+    <nav class="d-flex justify-content-center mt-4">
+  <ul class="pagination pagination-orbit">
+
+    <!-- Previous -->
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Previous">&laquo;</span>
+      </li>
+    {% endif %}
+
+    <!-- Page numbers -->
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.paginator.num_pages > 7 %}
+        {% if num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:-1 and num <= page_obj.number|add:1 %}
+          <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% elif num == 2 and page_obj.number > 4 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% elif num == page_obj.paginator.num_pages|add:-1 and page_obj.number < page_obj.paginator.num_pages|add:-3 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% else %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Next -->
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Next">&raquo;</span>
+      </li>
+    {% endif %}
+
+  </ul>
+</nav>
+</div>
 {% endblock %}

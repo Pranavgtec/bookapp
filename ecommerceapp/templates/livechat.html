@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chat-scroll {
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+        /* Added for message styling flexibility */
+          .message-bubble {
+        padding: 8px 12px;
+        border-radius: 20px;
+        max-width: 85%; /* Increased from 75% */
+        word-wrap: break-word;
+    }
+    .sent-by-me {
+        background-color: #0d6efd;
+        color: white;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    .sent-by-other {
+        background-color: #f8f9fa;
+        color: #212529;
+        border: 1px solid #dee2e6;
+        border-top-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+        /* Added for consistency with timestamp display */
+        .message-info {
+            font-size: 0.7em;
+            color: #6c757d; /* Bootstrap muted color */
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+
+<div class="card shadow-lg w-100" style="max-width: 600px; height: 80vh;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2 px-3">
+        <strong>Chat with Admin</strong>
+    </div>
+
+    <div class="card-body chat-scroll bg-light" style="flex: 1 1 auto;">
+        {% if error %}
+            <div class="alert alert-warning text-center">{{ error }}</div>
+        {% else %}
+            {% for msg in messages %}
+                {% if msg.sender == request.user %}
+                    <div class="d-flex justify-content-end mb-2">
+                        <div>
+                            {# Your own message (historical/on refresh) #}
+                            <div class="text-end text-muted message-info">
+                                <strong>You</strong> • {{ msg.created_at|date:"M d, H:i" }}
+                            </div>
+                            <div class="message-bubble sent-by-me">
+                                {{ msg.content }}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-start mb-2">
+                        <div>
+                            {# Message from another user (likely Admin in this context) (historical/on refresh) #}
+                            <div class="text-start text-muted message-info">
+                                <strong>Admin</strong> • {{ msg.created_at|date:"M d, H:i" }}
+                            </div>
+                            <div class="message-bubble sent-by-other">
+                                {{ msg.content }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p class="text-muted text-center">No messages yet.</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if not error %}
+    <form class="d-flex border-top" method="post">
+        {% csrf_token %}
+        <input type="text" name="content" class="form-control border-0 rounded-0" placeholder="Type a message..." required>
+        <button class="btn btn-primary rounded-0" type="submit">Send</button>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    const inquiryId = {{ inquiry.id }};
+    const currentUserId = {{ request.user.id }};
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+
+    const chatSocket = new WebSocket(
+        `${wsScheme}://${window.location.host}/ws/chat/${inquiryId}/`
+    );
+
+    // Function to scroll to the bottom of the chat
+    function scrollToBottom() {
+        const chatBody = document.querySelector('.chat-scroll');
+        if (chatBody) {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    }
+
+    // Helper to format timestamp (for real-time messages)
+    function formatTimestamp(isoString) {
+        // If no ISO string, assume 'Just now' for simplicity in real-time
+        if (!isoString) {
+            return 'Just now';
+        }
+        const date = new Date(isoString);
+        const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return date.toLocaleDateString(undefined, options);
+    }
+
+
+    // Listen for messages from the server
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const message = data.message;
+        const senderId = data.sender_id;
+        const createdAt = data.created_at; // Consumer should send this now
+        const senderDisplayName = data.sender_display_name; // From consumer
+        const senderUsername = data.sender_username; // From consumer
+
+        // Append the message to the chat UI
+        const chatBody = document.querySelector('.chat-scroll');
+        const newMsgDiv = document.createElement('div');
+        newMsgDiv.classList.add('mb-2'); // Add margin bottom for spacing
+
+        let messageHtml = '';
+
+        if (senderId === currentUserId) {
+            // Message sent by the current user (this user)
+            newMsgDiv.classList.add("d-flex", "justify-content-end");
+            messageHtml = `
+                <div>
+                    <div class="text-end text-muted message-info">
+                        <strong>You</strong> • ${formatTimestamp(createdAt)}
+                    </div>
+                    <div class="message-bubble sent-by-me">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        } else {
+            // Message sent by the other party (Admin, from the user's perspective)
+            newMsgDiv.classList.add("d-flex", "justify-content-start");
+            messageHtml = `
+                <div>
+                    <div class="text-start text-muted message-info">
+                        <strong>Admin</strong> • ${formatTimestamp(createdAt)}
+                    </div>
+                    <div class="message-bubble sent-by-other">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        }
+
+        newMsgDiv.innerHTML = messageHtml;
+        chatBody.appendChild(newMsgDiv);
+        scrollToBottom(); // Scroll to bottom after adding message
+    };
+
+    // Handle errors or close
+    chatSocket.onerror = function(e) {
+        console.error('WebSocket error:', e);
+    };
+
+    chatSocket.onclose = function(e) {
+        console.warn('WebSocket closed unexpectedly');
+    };
+
+    // Intercept form submit to send message via WebSocket
+    const form = document.querySelector('form');
+    form.addEventListener("submit", function (event) { // Using addEventListener for consistency
+        event.preventDefault();
+
+        const input = form.querySelector('input[name="content"]');
+        const message = input.value;
+
+        if (message.trim()) {
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            input.value = ''; // Clear input field
+        }
+    });
+
+    // Initial scroll to bottom when page loads
+    window.onload = function() {
+        scrollToBottom();
+    };
+</script>
+
+</body>
+</html>

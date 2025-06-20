@@ -1,47 +1,130 @@
 {% extends 'base.html' %}
 
 {% block title %}
-
-<title>Checkout</title>
-
-
+<title>Secure Checkout</title>
 {% endblock %}
 
 {% block content %}
-
-<button id="rzp-button1">Pay with Razorpay</button>
-
-<script>
-   
-var options = {
-    "key": "{{key}}", // Enter the Key ID generated from the Dashboard
-    "amount": "{{amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "Acme Corp",
-    "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
-    "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    'callback_url' : 'http://127.0.0.1:8000/ecommerceapp/pay-verify/',
-    "handler": function (response){
-        alert(response.razorpay_payment_id);
-        alert(response.razorpay_order_id);
-        alert(response.razorpay_signature)
-    },
-    "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9000090000"
-    },
-    "notes": {
-        "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-        "color": "#3399cc"
+<style>
+    /* General body styling - keep it minimal here */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7f6;
+        margin: 0; /* Ensure no default body margin */
+        padding: 0; /* Ensure no default body padding */
     }
-};
 
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
+    /* Wrapper to center the checkout content horizontally and vertically */
+    .checkout-page-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - var(--navbar-height, 60px)); /* Adjust 60px for your navbar height */
+        /* Use a CSS variable if your navbar height is defined in base.html */
+        /* Otherwise, approximate or set a fixed height that works */
+        padding: 20px 0; /* Add some vertical padding */
+        box-sizing: border-box; /* Include padding in height calculation */
+    }
+
+    .checkout-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        margin-top: auto; /* Push content to center if min-height is larger */
+        margin-bottom: auto; /* Push content to center if min-height is larger */
+    }
+    h1 {
+        color: #2c3e50;
+        margin-bottom: 25px;
+        font-size: 2.2em;
+        font-weight: 600;
+    }
+    p {
+        color: #7f8c8d;
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    #rzp-button1 {
+        background-color: #28a745; /* A standard success green */
+        color: white;
+        padding: 15px 35px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+    }
+    #rzp-button1:hover {
+        background-color: #218838; /* Darker green on hover */
+        transform: translateY(-2px);
+    }
+    #rzp-button1:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(40, 167, 69, 0.5);
+    }
+    .security-note {
+        margin-top: 30px;
+        font-size: 0.9em;
+        color: #95a5a6;
+    }
+    .security-note i {
+        margin-right: 8px;
+        color: #28a745;
+    }
+</style>
+
+<div class="checkout-page-wrapper">
+    <div class="checkout-container">
+        <h1>Complete Your Secure Purchase</h1>
+        <p>You're just one step away from confirming your order. Click the button below to proceed with your payment securely.</p>
+
+        <button id="rzp-button1">Pay with Razorpay</button>
+
+        <div class="security-note">
+            <i class="fas fa-lock"></i> Your payment is processed securely by Razorpay.
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <script>
+    // Your original Razorpay JS code remains untouched here
+    var options = {
+        "key": "{{key}}", // Enter the Key ID generated from the Dashboard
+        "amount": "{{amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "Acme Corp",
+        "description": "Test Transaction",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        'callback_url': 'http://127.0.0.1:8000/ecommerceapp/pay-verify/',
+        "handler": function (response) {
+            alert(response.razorpay_payment_id);
+            alert(response.razorpay_order_id);
+            alert(response.razorpay_signature)
+        },
+        "prefill": {
+            "name": "Gaurav Kumar",
+            "email": "gaurav.kumar@example.com",
+            "contact": "9000090000"
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
         alert(response.error.code);
         alert(response.error.description);
         alert(response.error.source);
@@ -49,17 +132,12 @@ rzp1.on('payment.failed', function (response){
         alert(response.error.reason);
         alert(response.error.metadata.order_id);
         alert(response.error.metadata.payment_id);
-});
-console.log("Razorpay event listener set");
-document.getElementById('rzp-button1').onclick = function(e){
-
-    
-    rzp1.open();
-    e.preventDefault();
-}
-
-
-
+    });
+    console.log("Razorpay event listener set");
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    }
 </script>
 
 {% endblock %}

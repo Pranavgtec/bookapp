@@ -1,0 +1,19 @@
+{% extends 'store/base.html' %}
+
+{% block title %}
+<title>Edit</title>
+{% endblock %}
+
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data">
+    <div>
+        <img src="{{request.user.profile.profile_pic.url}}" alt="" srcset="" width="150" height="100">
+    </div>
+    {%csrf_token%}
+    user:{{request.user}}
+ {{form}}
+ <button type="submit">Edit</button>
+</form>
+
+{%  endblock %}

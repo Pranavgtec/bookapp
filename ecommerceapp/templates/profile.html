@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block title %}
+    <title>Profile</title>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class=" rounded-4 shadow p-4 border ">
+        <div class="text-center">
+            <div class="position-relative d-inline-block mb-3">
+               
+                <img src="{{ request.user.userprofile.profile_picture.url }}" alt="blankprofile" class="rounded-circle border border-2 border-white object-fit-cover" height="130" width="130">
+                
+                
+                <div class="position-absolute bottom-0 end-0 bg-white rounded-circle p-1">
+                    <a href="{% url 'profile-edit' user.id %}"><i class="bi bi-camera text-secondary " style="font-size: 1.5rem;"></i></a>
+                    
+                </div>
+            </div>
+            
+            
+            <h2 class="fw-bold mb-1">{{ request.user.username }}</h2>
+            <p class=" mb-2">{{request.user.userprofile.bio}}</p>
+            <p class="small">Member since: {{ request.user.userprofile.created_date }}</p> 
+
+            
+{% endblock %}
+
+
+

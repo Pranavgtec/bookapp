@@ -1,32 +1,128 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Delivery Details</title>   
+<title>Delivery Details</title>
 {% endblock %}
 
 {% block content %}
-{{request.user}}
 <div class="container my-5">
-  <div class="row justify-content-center ">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-      <div class="card shadow-sm p-4 rounded">
-        <h2 class="mb-4 text-center text-primary fw-bold">Delivery Details</h2>
-        <form action="" method="post">
-          {% csrf_token %}
-          {{ form }}
-         <button type="submit" class="btn btn-primary btn-lg  mt-3">
-          add
-           
-        </button>
-        </form>
-        
-        
-        
-       
-      </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4 delivery-card">
+                <div class="card-body p-5">
+                    <h2 class="mb-5 text-center fw-bold text-dark-blue">
+                        <i class="bi bi-truck-flatbed me-3 text-primary-gradient"></i>
+                        Confirm Your Delivery
+                    </h2>
+                    <form action="" method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-4 form-floating">
+                                {{ field }}
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary-gradient btn-lg w-100 mt-4 py-3 rounded-pill hover-scale-btn">
+                            Save Delivery Address
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Custom styles for Dribbble-inspired design */
 
+    body {
+        background-color: #f8f9fa; /* Light gray background for the page */
+    }
+
+    .delivery-card {
+        background: #ffffff;
+        border-radius: 20px !important; /* More rounded corners */
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important; /* Softer, larger shadow */
+        overflow: hidden; /* Ensures no content spills out of rounded corners */
+        padding: 2.5rem !important; /* Increase padding inside the card */
+    }
+
+    .text-dark-blue {
+        color: #1A2F50; /* A deep, rich blue for headings */
+    }
+
+    .text-primary-gradient {
+        background: linear-gradient(to right, #4A90E2, #8A2BE2); /* Blue to blue-violet gradient */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: #4A90E2; /* Fallback for browsers that don't support text-fill-color */
+    }
+
+    /* Form Floating Labels Customization */
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: calc(3.5rem + 2px); /* Adjust height for a more comfortable feel */
+        padding: 1rem 0.75rem; /* Padding for input text */
+        border-radius: 0.75rem; /* Rounded input fields */
+        border-color: #dee2e6; /* Light border color */
+    }
+
+    .form-floating > label {
+        padding: 1rem 0.75rem; /* Align label with input padding */
+        color: #6c757d; /* Muted label color */
+    }
+
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+        border-color: #8A2BE2; /* Violet border on focus */
+        box-shadow: 0 0 0 0.25rem rgba(138, 43, 226, 0.25); /* Subtle violet glow */
+    }
+
+    /* Primary Gradient Button */
+    .btn-primary-gradient {
+        background-image: linear-gradient(to right, #4A90E2 0%, #8A2BE2 100%);
+        border: none;
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3); /* Soft shadow for the button */
+    }
+
+    .btn-primary-gradient:hover {
+        background-position: right center; /* Moves the gradient on hover */
+        box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4); /* Stronger shadow on hover */
+        transform: translateY(-2px) scale(1.01); /* Slight lift and scale */
+    }
+
+    /* Hover effect for buttons */
+    .hover-scale-btn {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .hover-scale-btn:hover {
+        transform: scale(1.02); /* Slightly bigger on hover */
+    }
+
+    /* For invalid feedback from Django forms */
+    .invalid-feedback {
+        font-size: 0.875em;
+        color: #dc3545;
+        margin-top: 0.25rem;
+    }
+
+    /* Ensure icons in heading are aligned */
+    .bi {
+        vertical-align: -0.125em; /* Adjust to better align with text */
+    }
+</style>
 {% endblock %}

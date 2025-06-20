@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f3f4f6;
+    }
+    /* This ensures the card takes up most of the screen vertically,
+       similar to the second example's full-height chat window. */
+    .chat-card {
+      max-width: 600px;
+      height: 80vh; /* 80% of the viewport height */
+      display: flex;
+      flex-direction: column; /* Allows content to stack and the body to flex */
+    }
+    .chat-messages {
+      flex: 1; /* This makes the chat messages area take up available space */
+      overflow-y: auto;
+      padding: 1rem; /* Padding inside the scrollable area */
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 15px;
+      margin-bottom: 8px; /* Reduced margin for tighter spacing */
+      font-size: 15px;
+      line-height: 1.4;
+      word-wrap: break-word; /* Ensures long words break and wrap */
+    }
+    .message-left {
+      background-color: #ffffff;
+      color: #333;
+      border: 1px solid #ddd;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 4px; /* Slightly squared off for the corner */
+    }
+    .message-right {
+      background-color: #007bff;
+      color: #fff;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 4px; /* Slightly squared off for the corner */
+    }
+    .message-info {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+
+<div class="card shadow-lg w-100 chat-card">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2 px-3">
+    <h5 class="mb-0">Chat with {{ inquiry.user|default:inquiry.email }}</h5>
+    </div>
+
+  <div class="chat-messages bg-light">
+    {% for message in messages %}
+      {% if message.sender.is_staff %}
+        <div class="d-flex justify-content-end mb-3">
+          <div>
+            <div class="text-end text-muted message-info">
+              <strong>{{ message.sender }}</strong> • {{ message.created_at|date:"M d, H:i" }}
+            </div>
+            <div class="message message-right">
+              {{ message.content }}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="d-flex justify-content-start mb-3">
+          <div>
+            <div class="text-start text-muted message-info">
+              <strong>{{ message.sender|default:inquiry.email }}</strong> • {{ message.created_at|date:"M d, H:i" }}
+            </div>
+            <div class="message message-left">
+              {{ message.content }}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% empty %}
+      <p class="text-muted text-center">No messages yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card-footer bg-white border-top">
+    <form method="post" class="d-flex">
+      {% csrf_token %}
+      <input type="text" name="content" class="form-control border-0 rounded-0" placeholder="Type your reply..." required>
+      <button type="submit" class="btn btn-primary rounded-0">Send Reply</button>
+    </form>
+  </div>
+
+</div>
+
+
+<script>
+    const inquiryId = {{ inquiry.id }};
+    const currentUserId = {{ request.user.id }}; // This is the admin's ID
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+
+    const chatSocket = new WebSocket(
+        `${wsScheme}://${window.location.host}/ws/chat/${inquiryId}/`
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const message = data.message;
+        const senderId = data.sender_id;
+        const senderDisplayName = data.sender_display_name; // From consumer
+        const senderUsername = data.sender_username; // From consumer
+
+        const chatBody = document.querySelector('.chat-messages');
+        const newMsgDiv = document.createElement('div');
+
+        // Check if the sender is the current admin user
+        if (senderId === currentUserId) { // This means the admin sent the message
+            newMsgDiv.className = "d-flex justify-content-end mb-3";
+            newMsgDiv.innerHTML = `
+                <div>
+                    <div class="text-end text-muted message-info">
+                        <strong>${senderDisplayName || senderUsername || 'Admin'}</strong> • Just now
+                    </div>
+                    <div class="message message-right">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        } else { // This means the message came from the non-staff user
+            newMsgDiv.className = "d-flex justify-content-start mb-3";
+            newMsgDiv.innerHTML = `
+                <div>
+                    <div class="text-start text-muted message-info">
+                        <strong>${senderDisplayName || senderUsername}</strong> • Just now
+                    </div>
+                    <div class="message message-left">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        }
+
+        chatBody.appendChild(newMsgDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    };
+
+    // ... (rest of your JS for onerror, onclose, form.onsubmit)
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const input = form.querySelector("input[name='content']");
+        
+        const message = input.value.trim();
+        if (message) {
+            chatSocket.send(JSON.stringify({ message: message }));
+            input.value = "";
+        }
+    });
+
+    window.onload = function() {
+        const chatBody = document.querySelector('.chat-messages');
+        if (chatBody) {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    };
+</script>
+
+</body>
+</html>

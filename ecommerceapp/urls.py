@@ -27,5 +27,12 @@ urlpatterns = [
   path('no_permission/',views.NOPermissionView.as_view(),name='no_permission'),
   path('book-list/',views.BookListView.as_view(),name='book_list'),
   path('favourites/',views.BookFavouritesView.as_view(),name='favourite_books'),
-  path('delete-favourite/<int:pk>/',views.BookFavouriteDeleteView.as_view(),name='delete_favourite')
+  path('delete-favourite/<int:pk>/',views.BookFavouriteDeleteView.as_view(),name='delete_favourite'),
+  path('profile/',views.BookProfileView.as_view(),name='profile'),
+  path('cash_on_delivery/',views.CashOnDeliveryView.as_view(),name='cash_on_delivery'),
+  path('contactus/',views.ContactUsView.as_view(),name='contactus'),
+  path('livechat/',views.LiveChatView.as_view(),name='livechat'),
+  path('admin/livechat/<int:inquiry_id>/', views.AdminChatDetailView.as_view(), name='admin_chat_detail'),
+
+  
 ]

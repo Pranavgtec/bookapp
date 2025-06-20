@@ -7,7 +7,7 @@ class UserProfile(models.Model):
     
     user_object = models.OneToOneField(User,on_delete=models.CASCADE)
     bio = models.CharField(max_length=200,null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/')
+    profile_picture = models.ImageField(upload_to='profile_pics/',default='/profile_pics/default.png')
     created_date = models.DateField(auto_now_add=True)
     updated_date = models.DateField(auto_now=True)
 
@@ -59,6 +59,9 @@ class Book(models.Model):
     
     @property # Use @property to access it like book.star_fills, not book.star_fills()
     def star_fills(self):
+
+
+        
         if self.avg_rating is None:
             return [0] * 5
 
@@ -111,6 +114,10 @@ class Cart(models.Model):
             total=Sum(F('book_object__price') * F('quantity'))
         ).get('total')
     
+   
+    def cart_count(self):
+        return CartItems.objects.filter(cart_object=self,is_order_placed=False).count()
+    
 
 
 
@@ -133,7 +140,7 @@ class DeliveryDetails(models.Model):
     
     DELIVERY_OPTION = (
         ('cash_on_delivery','cash_on_delivery'),
-        ('free_delivery','free_delivery')
+        ('online payment','online payment')
     )
     name = models.CharField(max_length=70)
     address = models.CharField(max_length=150)
@@ -179,6 +186,58 @@ class Review(models.Model):
         return self.user_object.username                                                                                                        
 
 
+from django.db import models
+from django.contrib.auth.models import User
+
+class Inquiry(models.Model):
+    # Link to User if logged in; optional (null and blank allowed)
+    # If user is deleted or not found , set this field to NULL but keep the inquiry data
+    user = models.ForeignKey(
+        User, 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL
+    )
+    
+    
+ 
+
+    # First name of person submitting inquiry - required field
+    first_name = models.CharField(max_length=100)
+    
+    # Last name - required field
+    last_name = models.CharField(max_length=100)
+    
+    # Email - required and validated by EmailField
+    email = models.EmailField()
+    
+    # Phone number - optional, blank allowed in forms
+    # No null=True, so empty string stored if not given
+    phone = models.CharField(max_length=20, blank=True)
+    
+    # The main message or inquiry content - required
+    message = models.TextField()
+    
+    # Comma-separated string to store interests/categories selected
+    # Required field; you can add blank=True if optional
+    interests = models.CharField(max_length=500)
+    
+    # Timestamp for when inquiry was created, auto-set on insert
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        # Helpful display in Django admin or shell
+        return f"Inquiry from {self.first_name} ({self.email})"
+
+
+class InquiryMessage(models.Model):
+    inquiry = models.ForeignKey(Inquiry, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE) 
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message by {self.sender} at {self.created_at}"
 
     
 

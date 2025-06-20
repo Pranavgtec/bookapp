@@ -191,6 +191,9 @@
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" aria-current="page" href="{% url 'dashboard' %}">Dashboard</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link"   href="{% url 'home' %}">Home</a>
+        </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="adminContentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Content
@@ -257,6 +260,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_list' %}">
                             <i class="bi bi-list-columns-reverse me-2"></i> Book List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">
+                            <i class="bi bi-list-columns-reverse me-2"></i> 📨 Chats
                         </a>
                     </li>
                   

@@ -1,12 +1,14 @@
-from django.shortcuts import render,redirect,HttpResponseRedirect
+from django.shortcuts import render,redirect
 from  django.views.generic import View
-
-from ecommerceapp.forms import RegistrationForm,UserProfileForm,LoginForm,BookForm,TagForm,AuthorForm,DeliveryForm,ReviewForm
-from ecommerceapp.models import UserProfile,Book,CartItems,Cart,DeliveryDetails,OrderSummary,Tag,Author,Review,User
+from django.utils.decorators import method_decorator
+from ecommerceapp.decorators import login_required
+from ecommerceapp.forms import RegistrationForm,UserProfileForm,LoginForm,BookForm,TagForm,AuthorForm,DeliveryForm,ReviewForm,ContactForm
+from ecommerceapp.models import UserProfile,Book,CartItems,Cart,DeliveryDetails,OrderSummary,Author,Review,User,Inquiry,InquiryMessage
 from django.contrib.auth import authenticate,login,logout
 from ecommerceapp.permissions import SuperUserView
-from django.db.models import Sum,Q
+from django.db.models import Q,F
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 """   Razor Pay Section """
 import razorpay
@@ -22,6 +24,7 @@ class RegistrationView(View):
     
     def post(self,request,*args,**kwargs):
         form_instance = RegistrationForm(request.POST)
+        signup_success = False
         if form_instance.is_valid():
             form_instance.save()
             data = form_instance.cleaned_data
@@ -31,7 +34,8 @@ class RegistrationView(View):
             user_obj = authenticate(username=uname,password=pword)
             if user_obj:
                 login(request,user_obj)
-            return redirect('home')
+                signup_success = True
+                return render(request,'registration.html',{'signup_success':signup_success})
 
         return render(request,'registration.html',{'form':form_instance})
     
@@ -59,9 +63,7 @@ class LogoutView(View):
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('login')
-        else:
+       
             qs = Book.objects.all().order_by('id')
             for book in qs:
                 book.is_favorited = book.favourite.filter(id=request.user.id).exists()
@@ -73,14 +75,14 @@ class IndexView(View):
                     book.favourite.remove(request.user)
                 else:
                     book.favourite.add(request.user)
-                return redirect('home')
+                return redirect(f"{reverse('home')}?page={request.GET.get('page', 1)}")
 
             paginator = Paginator(qs, 8)  # show 8 books per page
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             return render(request, 'index.html', {'page_obj': page_obj})
 
-                        
+@method_decorator(login_required,name='dispatch')                  
 class EditProfileView(View):
    
     def get(self,request,*args,**kwargs):
@@ -161,6 +163,7 @@ class CreateAuthorView(SuperUserView,View):
             return redirect('book-create')
         return render(request,'author_create.html',{'form':form_instance})
     
+@method_decorator(login_required,name='dispatch')    
 class AddCartView(View):
 
     def get(self, request, *args, **kwargs):
@@ -198,35 +201,35 @@ class AddCartView(View):
         # Redirect user to 'home' page (you can change this to 'cart' or anywhere)
         return redirect('home')
 
-   
+@method_decorator(login_required,name='dispatch')
 class CartView(View):
 
     # Handle GET request to display user's cart
     def get(self, request, *args, **kwargs):
 
-        # Fetch the cart associated with the current logged-in user
-        cart = Cart.objects.get(user_object=request.user)
-        print("Cart:", cart)
+         # Fetch the cart associated with the current logged-in user
+            cart = Cart.objects.get(user_object=request.user)
+            print("Cart:", cart)
 
-        # Retrieve all cart items that belong to this cart and are not yet ordered
-        cart_object = CartItems.objects.filter(cart_object=cart, is_order_placed=False)
+            # Retrieve all cart items that belong to this cart and are not yet ordered
+            cart_object = CartItems.objects.filter(cart_object=cart, is_order_placed=False)
 
-        # Get the total price from the cart
-        cart_total = cart.total
+            # Get the total price from the cart
+            cart_total = cart.total
 
-        print("total amount:", cart_total)
+            print("total amount:", cart_total)
 
-        # Render the cart page with the list of cart items and the total amount
-        return render(request, 'cart.html', {'cart': cart_object, 'total': cart_total})
+            # Render the cart page with the list of cart items and the total amount
+            return render(request, 'cart.html', {'cart': cart_object, 'total': cart_total})
 
-    
+@method_decorator(login_required,name='dispatch')   
 class CartItemDeleteView(View):
     def get(self,request,*args,**kwargs):
         cartitem_id = kwargs.get('pk')
         CartItems.objects.get(id=cartitem_id,).delete()
         return redirect('cart')
 
-
+@method_decorator(login_required,name='dispatch')
 class DeliveryView(View):
     def get(self,request,*args,**kwargs):
            
@@ -244,11 +247,19 @@ class DeliveryView(View):
 
             form_instance.save()
 
-            return redirect('checkout')
+            if form_instance.instance.delivery_options == 'cash_on_delivery':
+                cart_items = CartItems.objects.filter(cart_object__user_object = request.user,is_order_placed=False)
+                for item in cart_items:
+                    item.is_order_placed = True
+                    item.save()
+                return redirect('cash_on_delivery')
+            else:
+                return redirect('checkout')
+
         
         return render(request,'delivery_details.html',{'form':form_instance})
     
-   
+@method_decorator(login_required,name='dispatch')
 class CheckoutView(View):
     def get(self, request, *args, **kwargs):
         client = razorpay.Client(auth=(KEY_ID, SECRET_KEY))
@@ -421,16 +432,16 @@ class BooksSearchView(View):
             }
         )
 
-        
+@method_decorator(login_required,name='dispatch')        
 class BookPaymentHistoryView(View):
     def get(self,request,*args,**kwargs):
 
-        
-        qs = OrderSummary.objects.filter(user_object=request.user,is_paid=True)
-        print(qs)
-        
-        return render(request,'book_pay_history.html',{'qs':qs})
+            qs = OrderSummary.objects.filter(user_object=request.user,is_paid=True)
+            print(qs)
+            
+            return render(request,'book_pay_history.html',{'qs':qs})
     
+@method_decorator(login_required,name='dispatch')  
 class BookReviewView(View):
     def get(self,request,*args,**kwargs):
         form_instance = ReviewForm()
@@ -496,36 +507,154 @@ class NOPermissionView(View):
     def get(self,request,*args,**kwargs):
         return render(request,'no_permission.html')
 
-class BookListView(View):
+class BookListView(SuperUserView,View):
     def get(self,request,*args,**kwargs):
         books = Book.objects.all()
         return render(request,'book_list.html',{'books':books})
-
-
+    
+@method_decorator(login_required,name='dispatch')
 class BookFavouritesView(View):
     def get(self,request,*args,**kwargs):
-
-      if not request.user.is_authenticated:
-        return redirect('login') 
-      else: 
+ 
         favourite_books = Book.objects.filter(favourite=request.user)
         print(favourite_books)
         return render(request,'book_favourite.html',{'favourite_books':favourite_books})
 
+@method_decorator(login_required,name='dispatch')
 class BookFavouriteDeleteView(View):
     def get(self,request,*args,**kwargs):
         book_id = kwargs.get('pk')
         book_object = Book.objects.get(id=book_id)
         book_object.favourite.remove(request.user)
         return redirect('favourite_books')
-
-
+    
+@method_decorator(login_required,name='dispatch')
+class BookProfileView(View):
+    def get(self,request,*args,**kwargs):
+        return render(request,'profile.html')
 
     
-
+class CashOnDeliveryView(View):
+    def get(self,request,*args,**kwargs):
+        return render(request,'cash_on_delivery.html')
     
 
+class ContactUsView(View):
 
-    
+    def get(self,request,*args,**kwargs):
+        return render(request,'contactus.html')
+
+    def post(self,request,*args,**kwargs):
+        countryCode = request.POST.get('countryCode')
+        form_instance = ContactForm(request.POST)
+        if form_instance.is_valid():
+          inquiry = form_instance.cleaned_data
+          phone = inquiry.get('phone')
+          form_instance.instance.phone = f'{countryCode+phone}'
+
+         
+
+          if request.user.is_authenticated:
+              form_instance.instance.user = request.user 
 
         
+              
+          form_instance.save()
+        return render(request,'contactus.html')
+    
+from django.views import View
+from django.shortcuts import render, redirect
+from .models import Inquiry, InquiryMessage
+
+class LiveChatView(View):
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        if not user.is_authenticated:
+            return redirect('login')  # or handle anonymous live chat with session key if needed
+
+        # 🔄 Step 0: Link all previous anonymous inquiries (with same email) to this user
+        Inquiry.objects.filter(user=None, email=user.email).update(user=user)
+
+        # 📌 Step 1: Get the earliest inquiry by this user
+        inquiry = Inquiry.objects.filter(user=user).order_by('created_at').first()
+
+        if not inquiry:
+            return render(request, "livechat.html", {
+                'error': "No previous inquiry found. Please contact us first."
+            })
+
+        # ✉️ Step 2: Save original inquiry message as the first chat message if not done yet
+        if inquiry.message and not InquiryMessage.objects.filter(inquiry=inquiry).exists():
+            InquiryMessage.objects.create(
+                inquiry=inquiry,
+                sender=user,
+                content=inquiry.message
+            )
+
+        # 💬 Step 3: Get all messages for this inquiry
+        messages = InquiryMessage.objects.filter(inquiry=inquiry).order_by('created_at')
+
+        return render(request, "livechat.html", {
+            'inquiry': inquiry,
+            'messages': messages
+        })
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if not user.is_authenticated:
+            return redirect('login')  # optional protection
+
+        content = request.POST.get('content')
+
+        # 🧾 Use the first inquiry made by the logged-in user
+        inquiry = Inquiry.objects.filter(user=user).order_by('created_at').first()
+
+        if inquiry and content:
+            InquiryMessage.objects.create(
+                inquiry=inquiry,
+                sender=user,
+                content=content
+            )
+
+        return redirect('livechat')
+
+       
+                         
+
+
+
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminChatDetailView(View):
+    def get(self, request, inquiry_id):
+        inquiry = Inquiry.objects.get(id=inquiry_id)
+        messages = InquiryMessage.objects.filter(inquiry=inquiry).order_by('created_at')
+        return render(request, "admin_chat_detail.html", {
+            'inquiry': inquiry,
+            'messages': messages
+        })
+
+    def post(self, request, inquiry_id):
+        inquiry = Inquiry.objects.get(id=inquiry_id)
+        content = request.POST.get('content')
+
+        if content:
+            InquiryMessage.objects.create(
+                inquiry=inquiry,
+                sender=request.user,  # This will be the admin
+                content=content
+            )
+
+        return redirect('admin_chat_detail', inquiry_id=inquiry.id)
+
+        
+
+
+
+
+

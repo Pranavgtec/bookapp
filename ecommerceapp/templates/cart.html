@@ -1,5 +1,46 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    <title>Cart </title>
+
+    <style>
+  .back-btn {
+    color: #212529;
+    border: 1px solid #212529;
+    background-color: transparent;
+  }
+
+  .back-btn:hover {
+    background-color: #212529;
+    color: white;
+  }
+
+
+
+
+  .dark-mode .list-group-item {
+    background-color: #1f1f1f;
+    color: #f1f1f1;
+    border-color: #333;
+  }
+
+  .dark-mode .cart-empty h5 {
+    color: #f1f1f1;
+  }
+
+  .dark-mode .back-btn {
+    color: #f1f1f1;
+    border: 1px solid #f1f1f1;
+    background-color: transparent;
+  }
+
+  .dark-mode .back-btn:hover {
+    background-color: #f1f1f1;
+    color: #121212;
+  }
+    </style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
 
@@ -7,8 +48,7 @@
 
   <ul class="list-group mb-4">
     {% for c in cart %}
-   
-    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start py-4">
+    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start py-4 cart-item">
       <div class="d-flex w-100 gap-3">
         <img
           src="{{ c.book_object.book_image.url }}"
@@ -21,9 +61,8 @@
             <div>
               <h5 class="mb-1 fw-bold">{{ c.book_object.title }}</h5>
               <ul class="list-unstyled mb-1">
-                <li>Price: {{ c.book_object.price }}</li>
-                <li>Selected Quantity: {{ c.quantity}}</li>
-                
+                <li>Price: ₹{{ c.book_object.price }}</li>
+                <li>Selected Quantity: {{ c.quantity }}</li>
                 <li>Author: {{ c.book_object.author_obj.author_name }}</li>
               </ul>
               {% if c.book_object.tag_obj.all %}
@@ -45,38 +84,23 @@
       </div>
     </li>
     {% empty %}
-    <li class="list-group-item py-5 text-center">
+    <li class="list-group-item py-5 text-center cart-empty">
       <h5>Your Cart is Empty</h5>
-      <a href="{% url 'home' %}" class="btn btn-outline-dark mt-3">Back to Shop</a>
+      <a href="{% url 'home' %}" class="btn back-btn mt-3 btn-outline-dark">Back to Shop</a>
     </li>
     {% endfor %}
   </ul>
 
- 
-  
-
-
   {% if cart %}
-
   <div class="text-end mb-4">
-    <p>
-      
-      <strong>Total: {{total}}</strong>
-      <span class="fw-semibold">
-        <b></b> 
-      </span>
-    </p>
+    <p><strong>Total: ₹{{ total }}</strong></p>
   </div>
 
-  <div class="d-flex justify-content-end gap-3 mb-5">
-    <a href="{% url 'home' %}" class="btn btn-outline-dark fw-bolder">Back to Shop</a>
-    <a href="{% url 'delivery-detail'%}" class="btn btn-dark">Checkout</a>
+  <div class="checkout-bar d-flex justify-content-end gap-3 mb-5 p-3 rounded-3">
+    <a href="{% url 'home' %}" class="btn back-btn btn-outline-dark ">Back to Shop</a>
+    <a href="{% url 'delivery-detail' %}" class="btn back-btn btn-outline-dark ">Checkout</a>
   </div>
-  
   {% endif %}
 
 </div>
 {% endblock %}
-
-
-

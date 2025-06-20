@@ -1,0 +1,297 @@
+Project Documentation: Online Bookstore
+
+1. Introduction
+
+    This project is an Online Bookstore application designed to provide users with a seamless experience for Browse, purchasing, and managing books. It supports different user roles, including administrators with full control over the book catalog and regular users who can browse, purchase, and manage their personal profiles and order history. The application also features a user-friendly dark/light mode toggle for enhanced accessibility.
+
+2. User Roles and Permissions
+    The application implements a robust role-based access control system to ensure data security and proper functionality for different user types.
+
+3. Admin User:
+
+    Description: Possesses full administrative privileges. Can access all public pages as well as dedicated admin sections.
+    Accessible Pages:
+        tag_create page (Admin only)
+        book_add page (Admin only)
+        author_create page (Admin only)
+        book_list page (Admin only)
+        index page
+        login page
+        registration page
+        about page
+        book_filter_or_search page
+        book_detail page
+        book_favourite page
+        cart page
+        checkout page
+        delivery_details page
+        payment_success page
+        edit_profile page
+        dashboard page (Admin-specific view)
+        book_pay_history
+        review page
+        bookupdate page
+
+    Key Actions: Add, edit, and delete books, authors, and tags; view all user data; manage orders and system configurations.
+
+4. Registered User:
+
+    Description: A standard user who has registered and logged into the system. Can browse books, make purchases, manage their profile, and view their order history.
+    Accessible Pages:
+        index page
+        login page
+        registration page
+        about page
+        book_filter_or_search page
+        book_detail page
+        book_favourite page
+        cart page
+        checkout page
+        delivery_details page
+        payment_success page
+        edit_profile page
+        dashboard page (User-specific view)
+        book_pay_history
+        review page
+        
+    Restricted Pages: Users are prevented from accessing admin-only pages such as tag_create, book_add, author_create, and book_list. Attempts to access these pages will redirect to the no_permission page.
+
+5. Guest User:
+
+    Description: An unregistered user who can browse the public areas of the application but cannot perform actions requiring authentication (e.g., adding to cart, checkout).
+    Accessible Pages:
+        index page
+        login page
+        registration page
+        about page
+        book_filter_or_search page
+        book_detail page
+        Restricted Pages: All pages requiring user authentication or specific roles.
+
+3. Application Pages and Functionality
+    Description : This section details the purpose and core functionality of each page within the application.
+
+    base page: This is the foundational template from which all other pages inherit. It contains common elements like the header, footer, navigation bar (including the dark/light toggle), and global styles, ensuring a consistent look and feel across the application.
+    index page (Home Page): The primary entry point for users, displaying featured books, popular categories, and general announcements.
+    login page: Provides a secure interface for registered users to log into their accounts.
+    registration page: Allows new users to create an account by providing necessary details.
+    about page: Contains information about the online bookstore, its mission, and contact details.
+    book_filter_or_search page: Enables users to efficiently find books by applying various filters (e.g., author, genre, price range) and through a keyword search.
+    book_detail page: Displays comprehensive information about a selected book, including its description, price, author, reviews, and options to add to cart or mark as favorite.
+    book_favourite page: Shows a personalized list of books that the logged-in user has marked as favorites.
+    cart page: A virtual shopping cart where users can review items selected for purchase, adjust quantities, or remove items before proceeding to checkout.
+    checkout page: Guides the user through the final stages of a purchase, including delivery details, payment options, and order confirmation.
+    delivery_details page: Part of the checkout process, where users input or confirm their shipping address.
+    payment_success page: Confirms that the user's payment has been processed successfully and their order has been placed.
+    edit_profile page: Allows registered users to update their personal information, such as bio and profile picture.
+    dashboard page:For Admin Users: Offers a high-level view of system metrics, recent activity, and quick links to administrative functions.
+    book_pay_history: Displays a chronological record of a user's past book purchases and payment transactions.
+    review page: Facilitates users in submitting reviews and ratings for books they have read or purchased.
+    bookupdate page: Enables admin to modify the details of existing books, such as title, author, description, price, and cover image.
+    no_permission page: A custom error page displayed when a user attempts to access a page for which they do not have the required permissions.
+  
+
+
+4. Admin-Only Pages and Functionality
+    Description :These pages are exclusively accessible to Admin Users and are crucial for managing the bookstore's content and operations.
+
+    tag_create page: Provides an interface for administrators to create and add new tags, which can be used to categorize books.
+    book_add page: Enables administrators to add new book entries to the database, including details like title, author, description, price, and cover image.
+    author_create page: Allows administrators to add new author profiles to the system, associating them with books.
+    book_list page: A comprehensive view for administrators to manage all books in the catalog. It typically includes options to view, edit, or delete existing book entries.
+
+5. Key Features
+
+    Dark/Light Toggle: Located in the navigation bar, this toggle allows users to switch between a dark theme and a light theme for the application interface. The user's preference is saved locally, ensuring their chosen theme persists across sessions.
+    Robust Search and Filtering: The book_filter_or_search page offers advanced search capabilities, allowing users to find books quickly by various criteria.
+    Secure User Authentication: Implemented with secure login and registration processes to protect user accounts and data.
+    Shopping Cart Management: Users can seamlessly add, remove, and update quantities of items in their shopping cart before checkout.
+    Role-Based Access Control: Ensures that only authorized users can access specific parts of the application, enhancing security and data integrity.
+
+
+
+
+
+
+    /* Base Styles */
+body {
+  background-color: #f6f8fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 2rem 1rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+h3 {
+  text-align: center;
+  font-weight: 800;
+  font-size: 2.2rem;
+  margin-bottom: 2.5rem;
+  color: #2c3e50;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+/* Card */
+.card {
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  border: 1px solid #eaeaea;
+  margin-bottom: 1rem; /* add some space between cards */
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Image */
+.image-hover {
+  overflow: hidden;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.image-hover img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+  border-radius: 10px 10px 0 0;
+}
+
+.card:hover .image-hover img {
+  transform: scale(1.05);
+}
+
+.no-image-placeholder {
+  height: 260px;
+  background-color: #ddd;
+  color: #666;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-style: italic;
+  font-size: 1rem;
+  border-radius: 10px 10px 0 0;
+  
+}
+
+/* Card Body */
+.card-body {
+  padding: 1rem 1rem 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem; /* reduced margin */
+  color: #2d3436;
+  line-height: 1.3;
+}
+
+.author {
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 500;
+  margin-bottom: 0; /* Removed bottom margin to close gap */
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  justify-content: center;
+  margin-top: 0;  /* removed top margin */
+  margin-bottom: 0.5rem; /* slight bottom margin */
+  gap: 5px;
+}
+
+.star-container {
+  width: 36px;
+  height: 36px;
+  position: relative;
+}
+
+.star-container span {
+  font-size: 2.4rem;
+  display: block;
+}
+
+.star-empty {
+  color: #ddd;
+}
+
+.star-fill {
+  color: #f39c12;
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Price & Meta */
+.price {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #d35400;
+  margin-bottom: 0.3rem; /* reduced margin */
+}
+
+.quantity {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 0.3rem;
+}
+
+/* Tags */
+.tags {
+  margin-top: auto;
+  margin-top: 1rem;
+}
+
+.badge {
+  background-color: #f8f9fa;
+  color: #444;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35em 0.75em;
+  border-radius: 50px;
+  margin: 2px 5px 4px 0;
+  border: 1px solid #ddd;
+  cursor: default;
+  user-select: none;
+}
+
+.badge:hover {
+  background-color: #e9ecef;
+}
+
+/* Alert */
+.alert {
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Grid spacing */
+.row {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 0.5rem; /* reduced vertical gutter for tighter rows */
+}

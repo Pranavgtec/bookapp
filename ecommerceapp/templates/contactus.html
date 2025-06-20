@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<style>
+/* --- Base Styles & Variables --- */
+:root {
+    --color-text-dark: #101828; /* Very dark grey for headings/strong text */
+    --color-text-medium: #475467; /* Medium grey for body text */
+    --color-text-light: #667085;  /* Lighter grey for descriptions/placeholders */
+    --color-border: #D0D5DD;      /* Light grey for borders */
+    --color-background-light: #F9FAFB; /* Very light background for page */
+    --color-background-card: #FFFFFF; /* White for card backgrounds */
+    --color-primary-blue: #007bff; /* A subtle brand blue (adjust as per brand) */
+    --color-primary-blue-dark: #0056b3; /* Darker blue for hover */
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --shadow-subtle: 0px 1px 3px rgba(16, 24, 40, 0.1), 0px 1px 2px rgba(16, 24, 40, 0.06); /* Very subtle shadow */
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Or 'Lato', 'Roboto', 'Open Sans' - any professional sans-serif */
+    color: var(--color-text-medium);
+    background-color: var(--color-background-light);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* --- Container & Header --- */
+.contact-page-container {
+    max-width: 1200px; /* Wider for professional feel */
+    margin: var(--spacing-xl) auto; /* Ample space above/below */
+    padding: 0 var(--spacing-lg); /* Padding on sides */
+}
+
+.contact-header-section {
+    text-align: center;
+    margin-bottom: var(--spacing-xl); /* Plenty of space below header */
+}
+
+.contact-title {
+    font-size: 2.5rem; /* Larger heading */
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.contact-subtitle {
+    font-size: 1.15rem; /* Slightly larger subtitle */
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto; /* Center subtitle */
+}
+
+/* --- Grid Layout for Form and Options --- */
+.contact-grid-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Form wider than options */
+    gap: var(--spacing-xl); /* Large gap between columns */
+    align-items: flex-start; /* Align top of columns */
+}
+
+/* --- Form Card Styling --- */
+.contact-form-card,
+.contact-options-card {
+    background-color: var(--color-background-card);
+    padding: var(--spacing-xl); /* Generous internal padding */
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--color-border); /* Subtle border */
+}
+
+/* --- Form Field Styling --- */
+.form-row-group {
+    display: flex;
+    gap: var(--spacing-lg); /* Space between first and last name */
+    margin-bottom: var(--spacing-lg); /* Space below the row */
+}
+
+.form-field {
+    margin-bottom: var(--spacing-lg); /* Consistent spacing between fields */
+    flex: 1; /* For elements inside form-row-group */
+}
+
+.form-field label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: var(--spacing-sm); /* Space between label and input */
+}
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="tel"],
+.form-field textarea,
+.phone-input-group select {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md); /* More padding for taller inputs */
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    box-sizing: border-box; /* Include padding in width */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: var(--color-text-light);
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.phone-input-group select:focus {
+    outline: none;
+    border-color: var(--color-primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle focus ring */
+}
+
+.form-field textarea {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 120px; /* Minimum height for message area */
+}
+
+.phone-input-group {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.phone-input-group select {
+    flex-shrink: 0; /* Don't let select shrink */
+    width: auto; /* Auto width based on content */
+    padding-right: var(--spacing-md); /* Ensure space for dropdown arrow */
+}
+
+
+/* --- Checkbox Group Styling --- */
+.form-field-checkbox-group {
+    margin-bottom: var(--spacing-xl); /* More space below checkboxes */
+}
+
+.checkbox-group-label {
+    margin-bottom: var(--spacing-lg); /* More space below label */
+}
+
+.checkbox-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Responsive grid for checkboxes */
+    gap: var(--spacing-md); /* Space between checkboxes */
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--color-text-dark);
+    cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+    /* Custom checkbox styling for consistency */
+    appearance: none; /* Hide default checkbox */
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    margin-right: var(--spacing-sm);
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    background-color: var(--color-background-card);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.checkbox-option input[type="checkbox"]:checked {
+    background-color: var(--color-primary-blue);
+    border-color: var(--color-primary-blue);
+}
+
+.checkbox-option input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px; /* Checkmark width */
+    height: 12px; /* Checkmark height */
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -60%) rotate(45deg); /* Position and rotate checkmark */
+}
+
+/* --- Submit Button --- */
+.submit-button {
+    background-color: var(--color-text-dark); /* Dark button as in example */
+    color: white;
+    padding: var(--spacing-md) var(--spacing-xl); /* Generous padding */
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%; /* Full width button */
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #2D3748; /* Slightly lighter dark on hover */
+}
+
+/* --- Contact Options Card Styling --- */
+.contact-options-card {
+    display: flex; /* Arrange items vertically */
+    flex-direction: column;
+    gap: var(--spacing-xl); /* Space between option items */
+}
+
+.contact-option-item {
+    padding-bottom: var(--spacing-xl); /* Bottom padding for separator */
+    border-bottom: 1px solid var(--color-border); /* Subtle separator */
+}
+.contact-option-item:last-child {
+    border-bottom: none; /* No border for the last item */
+    padding-bottom: 0;
+}
+
+.option-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.option-description {
+    font-size: 0.95rem;
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+}
+
+.option-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    color: var(--color-primary-blue);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.option-action-link:hover {
+    color: var(--color-primary-blue-dark);
+}
+
+.option-address {
+    font-style: normal; /* Remove italic for address */
+    color: var(--color-text-medium);
+    line-height: 1.5;
+    font-size: 0.95rem;
+    display: flex; /* For icon alignment */
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+}
+
+/* --- Icon Styling (assuming Font Awesome or similar) --- */
+/* You would replace these with actual icon classes or SVG embeds */
+[class^="icon-"] {
+    display: inline-block;
+    width: 18px; /* Consistent icon size */
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    /* Example: using a placeholder background for demonstration */
+    background-color: currentColor; /* Inherit color */
+    mask-image: url('path/to/your/icon.svg'); /* Use SVG masks for real icons */
+    -webkit-mask-image: url('path/to/your/icon.svg');
+}
+/* Specific icons (replace with actual SVG paths or Font Awesome classes) */
+.icon-live-chat { /* Example: background-image: url('path/to/chat-icon.svg'); */ }
+.icon-phone { /* Example: background-image: url('path/to/phone-icon.svg'); */ }
+.icon-location { /* Example: background-image: url('path/to/location-icon.svg'); */ }
+.icon-email { /* Example: background-image: url('path/to/email-icon.svg'); */ }
+
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .contact-grid-layout {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        gap: var(--spacing-lg); /* Reduce gap */
+    }
+
+    .contact-form-card,
+    .contact-options-card {
+        padding: var(--spacing-lg); /* Reduce padding on smaller screens */
+    }
+
+    .form-row-group {
+        flex-direction: column; /* Stack first/last name fields */
+        gap: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-page-container {
+        padding: 0 var(--spacing-md);
+    }
+
+    .contact-title {
+        font-size: 2rem;
+    }
+
+    .contact-subtitle {
+        font-size: 1rem;
+    }
+
+    .checkbox-options-grid {
+        grid-template-columns: 1fr; /* Stack checkboxes on very small screens */
+    }
+}
+</style>
+<body>
+<div class="contact-page-container">
+    <header class="contact-header-section">
+        <h1 class="contact-title">Need Help with a Book?</h1>
+    <p class="contact-subtitle">Whether it’s about availability, orders, or recommendations — ask away!</p>
+
+    </header>
+
+    <div class="contact-grid-layout">
+        <div class="contact-form-card">
+            <form  method="POST" >
+                {% csrf_token %}
+                <div class="form-row-group">
+                    <div class="form-field">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" name="first_name" placeholder="Your first name" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" name="last_name" placeholder="Your last name" required>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@company.com" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <div class="phone-input-group">
+                         <select name="countryCode" class="country-code-select">
+                            <option value="+91">IN +91</option>
+                            <option value="+1">US +1</option>
+                            </select>
+                        <input type="tel" id="phone" name="phone" placeholder="e.g., 98765 43210">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="message">Your Message</label>
+                    <textarea id="message" name="message" rows="6" placeholder="Tell us about your inquiry or project details..." required></textarea>
+                </div>
+
+                <div class="form-field-checkbox-group">
+                    <label class="checkbox-group-label">I'm interested in:</label>
+                    <div class="checkbox-options-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Fiction"> Fiction</label>
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Romance"> Romance</label>
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Tragedy">Tragedy</label>
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Comedy">Comedy</label>
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Investigation">Investigation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="interests" value="Other"> Other</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button">Send Message</button>
+            </form>
+        </div>
+
+        <div class="contact-options-card">
+            <div class="contact-option-item">
+                <h3 class="option-title">Chat with us</h3>
+                <p class="option-description">Speak to our friendly team via live chat for immediate assistance.</p>
+                <a href="{% url 'livechat' %}" class="option-action-link"><span class="icon-live-chat"></span>Start a live chat</a>
+            </div>
+
+            <div class="contact-option-item">
+                <h3 class="option-title">Call us</h3>
+                <p class="option-description">Our team is available Mon-Fri from 9am to 6pm IST.</p>
+                <a href="tel:+919876543210" class="option-action-link"><span class="icon-phone"></span>+91 98765 43210</a>
+            </div>
+
+            <div class="contact-option-item">
+                <h3 class="option-title">Visit us</h3>
+                <p class="option-description">Connect with us in person at our Delhi HQ (by appointment).</p>
+                <address class="option-address">
+                    <span class="icon-location"></span>
+                    123 Innovation Drive,<br>
+                    Tech Park, New Delhi,<br>
+                    India 110001
+                </address>
+            </div>
+             <div class="contact-option-item">
+                <h3 class="option-title">Email us</h3>
+                <p class="option-description">For detailed inquiries or support, drop us an email.</p>
+                <a href="mailto:info@yourcompany.com" class="option-action-link"><span class="icon-email"></span>info@yourcompany.com</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
