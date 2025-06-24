@@ -1,5 +1,2 @@
-Django==5.2
-channels==4.0.0
-daphne==4.1.0
-dj-database-url==1.0.0  # or whatever version you use
-whitenoise==6.5.0       # check your installed version
+Delete file
+
